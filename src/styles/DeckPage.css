@@ -1,4 +1,5 @@
-/* DeckPage.css */
+
+/* DeckPage.css - importing common.css is required */
 
 /* Page Layout */
 .deck-page {
@@ -53,58 +54,7 @@
   flex-wrap: wrap;
 }
 
-/* Button Styles */
-.btn {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-  font-weight: 500;
-  transition: background-color 0.2s, transform 0.1s;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn:not(:disabled):active {
-  transform: translateY(1px);
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-delete {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background-color: #3b5066;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: #5a6268;
-}
-
-.btn-delete:hover:not(:disabled) {
-  background-color: #c82333;
-}
-
-/* Icon Buttons */
+/* Icon Buttons - specific to deck page */
 .btn-icon {
   background: none;
   border: none;
@@ -168,47 +118,7 @@ h2 {
   font-weight: 600;
 }
 
-/* Form Styling */
-.edit-deck-form .form-group {
-  margin-bottom: 1rem;
-}
-
-.edit-deck-form label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #495057;
-}
-
-.edit-deck-form input,
-.edit-deck-form textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-family: inherit;
-  transition: border-color 0.2s;
-}
-
-.edit-deck-form input:focus,
-.edit-deck-form textarea:focus {
-  border-color: #80bdff;
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-.edit-deck-form textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-/* Responsive Adjustments */
+/* Deck page specific responsive adjustments */
 @media (max-width: 576px) {
   .deck-stats {
     flex-direction: column;
@@ -223,8 +133,42 @@ h2 {
     flex-direction: column;
     align-items: stretch;
   }
-  
-  .form-actions {
-    flex-direction: column;
-  }
+}
+
+/* --- Button Styles --- */
+
+.btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #27ae60;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background-color: #c82333;
 }
