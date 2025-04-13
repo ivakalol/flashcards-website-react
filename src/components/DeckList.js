@@ -1,8 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { deleteDeck } from '../services/deckService';
 import '../styles/DeckList.css';
 
-function DeckList({ decks }) {
+function DeckList({ decks, onDelete }) {
+  // Handle deletion and refresh the decks list
+  const handleDeleteDeck = async (deckId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (window.confirm('Are you sure you want to delete this deck? This cannot be undone.')) {
+      await deleteDeck(deckId);
+      if (onDelete) {
+        onDelete(); // Callback to trigger a refresh of decks from parent component
+      }
+    }
+  };
+
   return (
     <div className="deck-list">
       {decks.map(deck => (
@@ -13,6 +27,12 @@ function DeckList({ decks }) {
           <div className="deck-actions">
             <Link to={`/deck/${deck.id}`} className="btn btn-view">View</Link>
             <Link to={`/study/${deck.id}`} className="btn btn-study">Study</Link>
+            <button 
+              className="btn btn-delete"
+              onClick={(e) => handleDeleteDeck(deck.id, e)}
+            >
+              Delete
+            </button>
           </div>
         </div>
       ))}

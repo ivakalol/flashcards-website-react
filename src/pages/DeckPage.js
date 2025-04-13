@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Flashcard from '../components/Flashcard';
 import CardForm from '../components/CardForm';
-import { getDeck, addCardToDeck } from '../services/deckService';
+import { getDeck, addCardToDeck, deleteCardFromDeck } from '../services/deckService';
 import '../styles/DeckPage.css';
 
 function DeckPage() {
@@ -11,18 +11,18 @@ function DeckPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
 
-  useEffect(() => {
-    const loadDeck = async () => {
-      try {
-        const deckData = await getDeck(deckId);
-        setDeck(deckData);
-      } catch (error) {
-        console.error('Failed to load deck:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const loadDeck = async () => {
+    try {
+      const deckData = await getDeck(deckId);
+      setDeck(deckData);
+    } catch (error) {
+      console.error('Failed to load deck:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadDeck();
   }, [deckId]);
 
@@ -33,6 +33,15 @@ function DeckPage() {
       setShowAddForm(false);
     } catch (error) {
       console.error('Failed to add card:', error);
+    }
+  };
+
+  const handleDeleteCard = async (cardId) => {
+    try {
+      const updatedDeck = await deleteCardFromDeck(deckId, cardId);
+      setDeck(updatedDeck);
+    } catch (error) {
+      console.error('Failed to delete card:', error);
     }
   };
 
@@ -70,7 +79,11 @@ function DeckPage() {
       {deck.cards.length > 0 ? (
         <div className="flashcards-grid">
           {deck.cards.map((card, index) => (
-            <Flashcard key={card.id || index} card={card} />
+            <Flashcard 
+              key={card.id || index} 
+              card={card} 
+              onDelete={handleDeleteCard} 
+            />
           ))}
         </div>
       ) : (

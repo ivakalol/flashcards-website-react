@@ -114,3 +114,27 @@ export const deleteDeck = async (deckId) => {
   const updatedDecks = decks.filter(deck => deck.id !== deckId);
   localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
 };
+
+// Delete a card from a deck
+export const deleteCardFromDeck = async (deckId, cardId) => {
+  const decks = await getDecks();
+  const deckIndex = decks.findIndex(deck => deck.id === deckId);
+  
+  if (deckIndex === -1) {
+    throw new Error('Deck not found');
+  }
+  
+  const updatedDeck = {
+    ...decks[deckIndex],
+    cards: decks[deckIndex].cards.filter(card => card.id !== cardId)
+  };
+  
+  const updatedDecks = [
+    ...decks.slice(0, deckIndex),
+    updatedDeck,
+    ...decks.slice(deckIndex + 1)
+  ];
+  
+  localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
+  return updatedDeck;
+};

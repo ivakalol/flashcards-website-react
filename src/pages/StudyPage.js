@@ -96,7 +96,10 @@ function StudyPage() {
       </div>
       
       <div className="study-card-container">
-        <Flashcard card={deck.cards[currentCardIndex]} />
+        <Flashcard 
+          card={deck.cards[currentCardIndex]} 
+          isInStudyMode={true} 
+        />
       </div>
 
       <div className="study-actions">
