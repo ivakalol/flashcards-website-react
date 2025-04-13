@@ -229,3 +229,9 @@ export const updateCardInDeck = async (deckId, cardId, cardData) => {
   localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
   return updatedDeck;
 };
+
+// Get count of child decks for a parent deck
+export const getChildDecksCount = async (parentId) => {
+  const decks = await getDecks();
+  return decks.filter(deck => deck.parentId === parentId).length;
+};

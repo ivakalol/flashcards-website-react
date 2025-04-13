@@ -43,6 +43,7 @@ function DeckPage() {
       setIsLoading(false);
     }
   };
+  
 
   useEffect(() => {
     loadDeck();
@@ -158,10 +159,21 @@ function DeckPage() {
 
   return (
     <div className="deck-page">
-      <Breadcrumb path={breadcrumbPath} />
+            <Breadcrumb path={breadcrumbPath} />
       
       <h1>{deck.title}</h1>
       <p className="deck-description">{deck.description}</p>
+      
+      <div className="deck-info">
+        <div className="deck-stats">
+          <span className="stat-item">
+            <i className="stat-icon card-icon">📝</i> {deck.cards.length} cards
+          </span>
+          <span className="stat-item">
+            <i className="stat-icon folder-icon">📁</i> {childDecks.length} nested decks
+          </span>
+        </div>
+      </div>
       
       <div className="deck-actions">
         <Link to={`/study/${deckId}`} className="btn btn-primary">Study Deck</Link>

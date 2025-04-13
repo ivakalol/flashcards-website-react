@@ -1,9 +1,30 @@
-/* Add this to your DeckPage.css if needed */
+/* DeckPage.css */ 
 
 .deck-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+}
+
+.deck-info {
+  margin-bottom: 1.5rem;
+}
+
+.deck-stats {
+  display: flex;
+  gap: 1.5rem;
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.stat-icon {
+  font-size: 1.3rem;
 }
 
 .deck-description {
@@ -159,3 +180,4 @@
 h2 {
   margin: 1.5rem 0 1rem;
 }
+
