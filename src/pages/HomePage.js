@@ -35,8 +35,8 @@ function HomePage() {
   return (
     <div className="home-page">
       <section className="hero-section">
-        <h1>Welcome to Flashcards</h1>
-        <p>Boost your learning with our interactive flashcards!</p>
+        <h1>Welcome to Schatz Cards</h1>
+        <p>The perfect website for the perfect person</p>
       </section>
       
       <section className="decks-section">

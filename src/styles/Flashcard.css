@@ -40,8 +40,8 @@
 }
 
 .flashcard-back {
-  background-color: #007bff;
-  color: white;
+  background-color: #FFC0CB;
+  color: 3f272b;
   transform: rotateY(180deg);
 }
 
