@@ -12,6 +12,8 @@ function StudyPage() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [knownCards, setKnownCards] = useState([]);
+  // Add a key state to force re-render of Flashcard component
+  const [cardKey, setCardKey] = useState(0);
 
   useEffect(() => {
     const loadDeck = async () => {
@@ -34,7 +36,10 @@ function StudyPage() {
     }
     
     if (currentCardIndex < deck.cards.length - 1) {
+      // Increment the card index
       setCurrentCardIndex(currentCardIndex + 1);
+      // Change the key to force Flashcard re-render in non-flipped state
+      setCardKey(prev => prev + 1);
     } else {
       setShowResults(true);
     }
@@ -44,6 +49,7 @@ function StudyPage() {
     setCurrentCardIndex(0);
     setKnownCards([]);
     setShowResults(false);
+    setCardKey(prev => prev + 1); // Reset the key for new session
   };
 
   if (isLoading) {
@@ -97,13 +103,14 @@ function StudyPage() {
       
       <div className="study-card-container">
         <Flashcard 
+          key={`card-${cardKey}`} // Add key prop to force re-render
           card={deck.cards[currentCardIndex]} 
           isInStudyMode={true} 
         />
       </div>
 
       <div className="study-actions">
-        <button className="btn btn-success" onClick={() => handleNextCard(true) }>
+        <button className="btn btn-success" onClick={() => handleNextCard(true)}>
           I know this
         </button>
         <button className="btn btn-danger" onClick={() => handleNextCard(false)}>

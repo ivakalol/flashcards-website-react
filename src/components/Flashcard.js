@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/Flashcard.css';
 
 function Flashcard({ card, onDelete, onEdit, isInStudyMode = false }) {
   const [isFlipped, setIsFlipped] = useState(false);
+  
+  // Reset flip state when card changes (important for study mode)
+  useEffect(() => {
+    setIsFlipped(false);
+  }, [card]);
 
   const handleCardClick = () => {
     setIsFlipped(!isFlipped);
@@ -27,7 +32,7 @@ function Flashcard({ card, onDelete, onEdit, isInStudyMode = false }) {
           <p>{card.question}</p>
           {!isInStudyMode && (
             <div className="flashcard-actions">
-              {/* Make edit button always visible with !important */}
+              {/* Make edit button always visible */}
               <button 
                 className="flashcard-edit-btn visible" 
                 onClick={handleEditClick}
