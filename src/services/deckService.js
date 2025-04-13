@@ -134,6 +134,47 @@ export const deleteCardFromDeck = async (deckId, cardId) => {
     updatedDeck,
     ...decks.slice(deckIndex + 1)
   ];
+
+
+  
+  
+  localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
+  return updatedDeck;
+};
+
+
+// Update a card in a deck
+export const updateCardInDeck = async (deckId, cardId, cardData) => {
+  const decks = await getDecks();
+  const deckIndex = decks.findIndex(deck => deck.id === deckId);
+  
+  if (deckIndex === -1) {
+    throw new Error('Deck not found');
+  }
+  
+  const cardIndex = decks[deckIndex].cards.findIndex(card => card.id === cardId);
+  
+  if (cardIndex === -1) {
+    throw new Error('Card not found');
+  }
+  
+  const updatedCards = [...decks[deckIndex].cards];
+  updatedCards[cardIndex] = {
+    ...updatedCards[cardIndex],
+    question: cardData.question,
+    answer: cardData.answer
+  };
+  
+  const updatedDeck = {
+    ...decks[deckIndex],
+    cards: updatedCards
+  };
+  
+  const updatedDecks = [
+    ...decks.slice(0, deckIndex),
+    updatedDeck,
+    ...decks.slice(deckIndex + 1)
+  ];
   
   localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
   return updatedDeck;
