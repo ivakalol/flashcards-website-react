@@ -75,3 +75,66 @@
   text-align: center;
   color: #6c757d;
 }
+
+/* Add these styles to your existing DeckList.css */
+
+.deck-edit-form {
+  padding: 1rem;
+}
+
+.deck-edit-form .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.deck-edit-form label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.deck-edit-form input,
+.deck-edit-form textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.deck-edit-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.deck-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-save {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #218838;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}

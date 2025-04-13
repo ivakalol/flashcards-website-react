@@ -181,3 +181,71 @@ h2 {
   margin: 1.5rem 0 1rem;
 }
 
+/* Add these styles to your existing DeckPage.css */
+
+.deck-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.btn-edit-icon {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.btn-edit-icon:hover {
+  background-color: #e0a800;
+}
+
+.edit-deck-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.edit-deck-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.edit-deck-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.edit-deck-form input,
+.edit-deck-form textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.edit-deck-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}

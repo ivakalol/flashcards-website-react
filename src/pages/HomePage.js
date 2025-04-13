@@ -23,8 +23,8 @@ function HomePage() {
     loadDecks();
   }, []);
 
-  // This function will be called after a deck is deleted
-  const handleDeckDeleted = () => {
+  // This function will be called after a deck is deleted or updated
+  const handleDeckChanged = () => {
     loadDecks();
   };
 
@@ -42,7 +42,11 @@ function HomePage() {
       <section className="decks-section">
         <h2>Your Flashcard Decks</h2>
         {decks.length > 0 ? (
-          <DeckList decks={decks} onDelete={handleDeckDeleted} />
+          <DeckList 
+            decks={decks} 
+            onDelete={handleDeckChanged}
+            onUpdate={handleDeckChanged}
+          />
         ) : (
           <p>No decks found. Start by creating a new deck!</p>
         )}
