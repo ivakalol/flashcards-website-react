@@ -103,7 +103,7 @@ function StudyPage() {
       </div>
 
       <div className="study-actions">
-        <button className="btn btn-success" onClick={() => handleNextCard(true)}>
+        <button className="btn btn-success" onClick={() => handleNextCard(true) }>
           I know this
         </button>
         <button className="btn btn-danger" onClick={() => handleNextCard(false)}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DeckList from '../components/DeckList';
-import { getDecks } from '../services/deckService';
+import { getDecksByParentId } from '../services/deckService';
 import '../styles/HomePage.css';
 
 function HomePage() {
@@ -9,7 +9,8 @@ function HomePage() {
 
   const loadDecks = async () => {
     try {
-      const decksData = await getDecks();
+      // Get only top-level decks (parentId = null)
+      const decksData = await getDecksByParentId(null);
       setDecks(decksData);
     } catch (error) {
       console.error('Failed to load decks:', error);

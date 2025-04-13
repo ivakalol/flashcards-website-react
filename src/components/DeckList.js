@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { deleteDeck } from '../services/deckService';
+import { deleteDeck, getDecksByParentId } from '../services/deckService';
 import '../styles/DeckList.css';
 
 function DeckList({ decks, onDelete }) {
@@ -9,7 +9,7 @@ function DeckList({ decks, onDelete }) {
     e.preventDefault();
     e.stopPropagation();
     
-    if (window.confirm('Are you sure you want to delete this deck? This cannot be undone.')) {
+    if (window.confirm('Are you sure you want to delete this deck and all its contents? This cannot be undone.')) {
       await deleteDeck(deckId);
       if (onDelete) {
         onDelete(); // Callback to trigger a refresh of decks from parent component
@@ -23,7 +23,10 @@ function DeckList({ decks, onDelete }) {
         <div key={deck.id} className="deck-card">
           <h3>{deck.title}</h3>
           <p>{deck.description}</p>
-          <p>{deck.cards.length} cards</p>
+          <div className="deck-stats">
+            <span>{deck.cards.length} cards</span>
+            {/* If needed, you could fetch child deck count here */}
+          </div>
           <div className="deck-actions">
             <Link to={`/deck/${deck.id}`} className="btn btn-view">View</Link>
             <Link to={`/study/${deck.id}`} className="btn btn-study">Study</Link>

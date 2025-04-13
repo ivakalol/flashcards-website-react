@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createDeck } from '../services/deckService';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { createDeck, getDeck } from '../services/deckService';
+import Breadcrumb from '../components/Breadcrumb';
 import '../styles/CreatePage.css';
 
 function CreatePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const parentId = searchParams.get('parentId');
+  
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState('');
+  const [parentDeck, setParentDeck] = useState(null);
+
+  useEffect(() => {
+    // If parentId is provided, load parent deck info for breadcrumbs
+    if (parentId) {
+      const loadParentDeck = async () => {
+        try {
+          const deck = await getDeck(parentId);
+          setParentDeck(deck);
+        } catch (error) {
+          console.error('Error loading parent deck:', error);
+        }
+      };
+      
+      loadParentDeck();
+    }
+  }, [parentId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +37,7 @@ function CreatePage() {
     setError('');
 
     try {
-      const newDeck = await createDeck({ title, description });
+      const newDeck = await createDeck({ title, description }, parentId);
       navigate(`/deck/${newDeck.id}`);
     } catch (error) {
       console.error('Failed to create deck:', error);
@@ -28,7 +49,15 @@ function CreatePage() {
 
   return (
     <div className="create-page">
-      <h1>Create New Flashcard Deck</h1>
+      {parentDeck && (
+        <Breadcrumb path={[{ id: parentDeck.id, title: parentDeck.title }]} />
+      )}
+      
+      <h1>{parentDeck ? 'Create Nested Deck' : 'Create New Flashcard Deck'}</h1>
+      {parentDeck && (
+        <p className="parent-deck-info">Creating a deck inside: <strong>{parentDeck.title}</strong></p>
+      )}
+      
       {error && <div className="error-message">{error}</div>}
       
       <form className="create-deck-form" onSubmit={handleSubmit}>
@@ -49,7 +78,6 @@ function CreatePage() {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            required
           />
         </div>
         
@@ -64,7 +92,7 @@ function CreatePage() {
           <button 
             type="button" 
             className="btn btn-secondary"
-            onClick={() => navigate('/')}
+            onClick={() => parentDeck ? navigate(`/deck/${parentId}`) : navigate('/')}
           >
             Cancel
           </button>
