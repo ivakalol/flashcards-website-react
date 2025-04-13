@@ -1,32 +1,66 @@
-.home-page {
-  padding: 20px 0;
+/* Home page specific styles */
+:root {
+  /* Extending our color palette */
+  --color-accent: #FFC0CB;  /* Pink from hero section */
+  --color-accent-text: #3f272b;
+  --heading-color: #000000;
+  
+  /* Spacing variables */
+  --section-spacing: 30px;
 }
 
+/* Layout components */
+.home-page {
+  padding: var(--spacing-md) 0;
+}
+
+/* Hero section */
 .hero-section {
   text-align: center;
-  padding: 40px 20px;
-  background-color: #FFC0CB;
-  color: #3f272b;
-  border-radius: 8px;
-  margin-bottom: 30px;
+  padding: calc(var(--spacing-lg) + 10px) var(--spacing-md);
+  background-color: var(--color-accent);
+  color: var(--color-accent-text);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--section-spacing);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .hero-section h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
+  font-size: 2.25rem; /* 36px with default font size of 16px */
+  margin-bottom: var(--spacing-sm);
+  font-weight: 700;
 }
 
 .hero-section p {
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   max-width: 600px;
   margin: 0 auto;
+  line-height: 1.6;
 }
 
+/* Decks section */
 .decks-section {
-  margin-top: 30px;
+  margin-top: var(--section-spacing);
 }
 
 .decks-section h2 {
-  margin-bottom: 20px;
-  color: #000000;
+  margin-bottom: var(--spacing-md);
+  color: var(--heading-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: var(--spacing-md);
+  }
+  
+  .hero-section h1 {
+    font-size: 1.75rem; /* 28px */
+  }
+  
+  .hero-section p {
+    font-size: 1rem; /* 16px */
+  }
 }

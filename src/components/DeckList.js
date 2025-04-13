@@ -161,7 +161,6 @@ function DeckList({ decks, onDelete, onUpdate }) {
               </div>
               <div className="deck-actions">
                 <Link to={`/deck/${deck.id}`} className="btn btn-view">View</Link>
-                <Link to={`/study/${deck.id}`} className="btn btn-study">Study</Link>
                 <button 
                   className="btn btn-edit"
                   onClick={(e) => handleEditClick(deck, e)}
@@ -175,6 +174,7 @@ function DeckList({ decks, onDelete, onUpdate }) {
                 >
                   Delete
                 </button>
+                <Link to={`/study/${deck.id}`} className="btn btn-study">Study</Link>
               </div>
             </>
           )}

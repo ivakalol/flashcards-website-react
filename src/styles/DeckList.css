@@ -1,3 +1,6 @@
+/* DeckList Component */
+
+/* Grid Layout */
 .deck-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -5,12 +8,16 @@
   margin-top: 20px;
 }
 
+/* Deck Card */
 .deck-card {
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .deck-card:hover {
@@ -19,41 +26,28 @@
 }
 
 .deck-card h3 {
-  margin-bottom: 10px;
+  margin: 0 0 10px 0;
   color: #2c3e50;
+  font-size: 1.25rem;
 }
 
 .deck-card p {
   color: #666;
   margin-bottom: 15px;
+  line-height: 1.5;
+  /* Add line clamping for descriptions that are too long */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
 }
 
-.deck-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.btn-view {
-  background-color: #3498db;
-  color: white;
-}
-
-.btn-study {
-  background-color: #2ecc71;
-  color: white;
-}
-
-.btn-delete {
-  background-color: #ff5252;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #ff1a1a;
-}
+/* Deck Statistics */
 .deck-stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1rem;
   color: #6c757d;
@@ -70,16 +64,103 @@
   font-size: 1.2rem;
 }
 
+/* Deck Actions */
+.deck-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  gap: 8px;
+}
+
+/* Button Styles */
+.btn {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  text-align: center;
+  flex: 1;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-view {
+  background-color: #1e85c9;
+  color: white;
+}
+
+.btn-view:hover {
+  background-color: #2980b9;
+}
+
+.btn-study {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-study:hover {
+  background-color: #27ae60;
+}
+
+.btn-delete {
+  background-color: #ff5252;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #ff1a1a;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800;
+}
+
+.btn-save {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+/* Loading State */
 .loading-counts {
   padding: 1rem;
   text-align: center;
   color: #6c757d;
+  font-style: italic;
 }
 
-/* Add these styles to your existing DeckList.css */
-
+/* Edit Form */
 .deck-edit-form {
   padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 .deck-edit-form .form-group {
@@ -90,6 +171,7 @@
   display: block;
   margin-bottom: 0.25rem;
   font-weight: 500;
+  color: #495057;
 }
 
 .deck-edit-form input,
@@ -99,6 +181,14 @@
   border: 1px solid #ced4da;
   border-radius: 4px;
   font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.deck-edit-form input:focus,
+.deck-edit-form textarea:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 .deck-edit-form textarea {
@@ -112,29 +202,32 @@
   margin-top: 1rem;
 }
 
-.btn-save {
-  background-color: #28a745;
-  color: white;
+/* Empty State */
+.no-decks {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
 }
 
-.btn-save:hover {
-  background-color: #218838;
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .deck-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .deck-actions {
+    flex-direction: column;
+  }
+  
+  .deck-edit-actions {
+    flex-direction: column;
+  }
 }
 
-.btn-edit {
-  background-color: #ffc107;
-  color: #212529;
-}
-
-.btn-edit:hover {
-  background-color: #e0a800;
-}
-
-.btn-cancel {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-cancel:hover {
-  background-color: #5a6268;
+/* For very small screens */
+@media (max-width: 350px) {
+  .deck-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }

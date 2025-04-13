@@ -1,9 +1,18 @@
-/* DeckPage.css */ 
+/* DeckPage.css */
 
+/* Page Layout */
 .deck-page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+}
+
+/* Deck Header and Info */
+.deck-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .deck-info {
@@ -12,9 +21,11 @@
 
 .deck-stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   color: #6c757d;
   font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
 .stat-item {
@@ -31,80 +42,10 @@
   margin-bottom: 2rem;
   font-size: 1.1rem;
   color: #6c757d;
+  line-height: 1.5;
 }
 
-.deck-actions {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-delete {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #0069d9;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
-}
-
-.btn-delete:hover {
-  background-color: #c82333;
-}
-
-.add-card-section,
-.edit-card-section {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 5px;
-}
-
-.flashcards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-
-.deck-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-.deck-description {
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-  color: #6c757d;
-}
-
+/* Deck Actions */
 .deck-actions {
   display: flex;
   gap: 1rem;
@@ -112,6 +53,7 @@
   flex-wrap: wrap;
 }
 
+/* Button Styles */
 .btn {
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -120,13 +62,19 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  gap: 0.5rem;
   justify-content: center;
   font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn:not(:disabled):active {
+  transform: translateY(1px);
 }
 
 .btn-primary {
@@ -145,7 +93,7 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #0069d9;
+  background-color: #3b5066;
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -156,40 +104,7 @@
   background-color: #c82333;
 }
 
-.add-card-section,
-.edit-card-section,
-.add-deck-section {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 5px;
-}
-
-.child-decks-section {
-  margin: 2rem 0;
-  padding-top: 1rem;
-  border-top: 1px solid #dee2e6;
-}
-
-.flashcards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-h2 {
-  margin: 1.5rem 0 1rem;
-}
-
-/* Add these styles to your existing DeckPage.css */
-
-.deck-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
+/* Icon Buttons */
 .btn-icon {
   background: none;
   border: none;
@@ -201,7 +116,11 @@ h2 {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-icon:hover {
+  transform: scale(1.1);
 }
 
 .btn-edit-icon {
@@ -213,13 +132,43 @@ h2 {
   background-color: #e0a800;
 }
 
+/* Section Styles */
+.add-card-section,
+.edit-card-section,
+.add-deck-section,
 .edit-deck-section {
   margin-bottom: 2rem;
   padding: 1.5rem;
   background-color: #f8f9fa;
   border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.edit-deck-section {
+  border-left: 3px solid #ffc107;
+}
+
+.child-decks-section {
+  margin: 2rem 0;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Flashcards Grid */
+.flashcards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Typography */
+h2 {
+  margin: 1.5rem 0 1rem;
+  color: #343a40;
+  font-weight: 600;
+}
+
+/* Form Styling */
 .edit-deck-form .form-group {
   margin-bottom: 1rem;
 }
@@ -228,6 +177,7 @@ h2 {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  color: #495057;
 }
 
 .edit-deck-form input,
@@ -237,6 +187,14 @@ h2 {
   border: 1px solid #ced4da;
   border-radius: 4px;
   font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.edit-deck-form input:focus,
+.edit-deck-form textarea:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 .edit-deck-form textarea {
@@ -248,4 +206,25 @@ h2 {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .deck-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .flashcards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .deck-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
 }

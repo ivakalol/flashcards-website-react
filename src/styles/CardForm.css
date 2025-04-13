@@ -1,9 +1,11 @@
+/* Card Form Component */
 
 .card-form {
   background-color: #f8f9fa;
   padding: 1.5rem;
   border-radius: 5px;
-  margin-bottom: 2  rem;
+  margin-bottom: 2rem; /* Fixed the extra space typo */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .form-group {
@@ -13,18 +15,45 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: bold;
+  font-weight: 500;
+  color: #495057;
 }
 
 .form-group textarea {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #ced4da;
   border-radius: 4px;
   min-height: 100px;
   font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  line-height: 1.5;
 }
 
+.form-group textarea:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Optional form fields */
+.form-group.optional label::after {
+  content: " (optional)";
+  font-weight: normal;
+  font-style: italic;
+  color: #6c757d;
+  font-size: 0.9em;
+}
+
+/* Form actions container */
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+/* Button styles */
 .btn-submit {
   background-color: #28a745;
   color: white;
@@ -32,7 +61,8 @@
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
-  margin-right: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .btn-cancel {
@@ -42,6 +72,8 @@
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .btn-submit:hover {
@@ -50,4 +82,37 @@
 
 .btn-cancel:hover {
   background-color: #5a6268;
+}
+
+.btn-submit:active,
+.btn-cancel:active {
+  transform: translateY(1px);
+}
+
+/* Error states */
+.form-group.has-error textarea {
+  border-color: #dc3545;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Loading state */
+.form-group.is-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Responsiveness */
+@media (max-width: 576px) {
+  .card-form {
+    padding: 1rem;
+  }
+  
+  .form-group textarea {
+    padding: 0.5rem;
+  }
 }

@@ -1,4 +1,4 @@
-/* Update the CSS for the Flashcard component */
+/* Flashcard Component */
 
 .flashcard {
   position: relative;
@@ -14,35 +14,46 @@
   transition: transform 0.6s;
   transform-style: preserve-3d;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .flashcard.flipped .flashcard-inner {
   transform: rotateY(180deg);
 }
 
-.flashcard-front, .flashcard-back {
+.flashcard-front, 
+.flashcard-back {
   position: absolute;
   width: 100%;
   height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari support */
   backface-visibility: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  border-radius: 5px;
+  border-radius: 8px;
   overflow: auto;
+  text-align: center;
 }
 
 .flashcard-front {
   background-color: #f8f9fa;
   color: #212529;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
 .flashcard-back {
   background-color: #FFC0CB;
-  color: 3f272b;
+  color: #3f272b; /* Fixed missing # in color value */
   transform: rotateY(180deg);
+}
+
+.flashcard-content {
+  max-width: 100%;
+  word-break: break-word;
+  font-size: 1.25rem;
 }
 
 .flashcard-actions {
@@ -50,7 +61,7 @@
   top: 8px;
   right: 8px;
   display: flex;
-  gap: 5px;
+  gap: 8px;
   z-index: 2;
 }
 
@@ -58,18 +69,18 @@
 .flashcard-edit-btn {
   border: none;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  /* Remove opacity property to make buttons always visible */
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Add visible class to ensure buttons are always shown */
+/* Class to ensure buttons are always visible */
 .visible {
   opacity: 1 !important;
 }
@@ -86,8 +97,63 @@
 
 .flashcard-delete-btn:hover {
   background-color: #ff1a1a;
+  transform: scale(1.1);
 }
 
 .flashcard-edit-btn:hover {
   background-color: #e0a800;
+  transform: scale(1.1);
+}
+
+/* Focus states for accessibility */
+.flashcard-delete-btn:focus,
+.flashcard-edit-btn:focus {
+  outline: 2px solid #4285f4;
+  outline-offset: 2px;
+}
+
+/* Add flashcard indicator dots */
+.flashcard-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.flashcard-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.flashcard-indicator-dot.active {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Add responsive adjustments */
+@media (max-width: 768px) {
+  .flashcard {
+    height: 180px;
+  }
+  
+  .flashcard-content {
+    font-size: 1.1rem;
+  }
+  
+  .flashcard-actions {
+    top: 6px;
+    right: 6px;
+    gap: 6px;
+  }
+  
+  .flashcard-delete-btn,
+  .flashcard-edit-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
 }
