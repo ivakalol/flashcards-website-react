@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { createDeck, getDeck } from '../services/deckService';
 import Breadcrumb from '../components/Breadcrumb';
+import ColorSelector, { colorOptions } from '../components/ColorSelector';
 import '../styles/CreatePage.css';
 
 // Component to show parent deck information
@@ -22,7 +23,8 @@ function CreatePage() {
   // Form state
   const [formData, setFormData] = useState({
     title: '',
-    description: ''
+    description: '',
+    color: colorOptions[5].value // Default to folder color
   });
   
   // UI state
@@ -61,6 +63,14 @@ function CreatePage() {
     });
   };
 
+  // Handle color selection
+  const handleColorChange = (color) => {
+    setFormData({
+      ...formData,
+      color: color
+    });
+  };
+
   // Navigate back to appropriate location
   const handleCancel = () => {
     if (parentDeck) {
@@ -86,7 +96,8 @@ function CreatePage() {
     try {
       const newDeck = await createDeck({
         title: formData.title,
-        description: formData.description
+        description: formData.description,
+        color: formData.color
       }, parentId);
       
       navigate(`/deck/${newDeck.id}`);
@@ -128,6 +139,14 @@ function CreatePage() {
             name="description"
             value={formData.description}
             onChange={handleInputChange}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="color">Deck Color:</label>
+          <ColorSelector 
+            selectedColor={formData.color}
+            onChange={handleColorChange}
           />
         </div>
         

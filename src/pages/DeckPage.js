@@ -4,6 +4,7 @@ import Flashcard from '../components/Flashcard';
 import CardForm from '../components/CardForm';
 import DeckList from '../components/DeckList';
 import Breadcrumb from '../components/Breadcrumb';
+import ColorSelector from '../components/ColorSelector';
 import { 
   getDeck, 
   getDecksByParentId, 
@@ -21,14 +22,16 @@ import '../styles/DeckPage.css';
 function DeckEditForm({ deck, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     title: deck?.title || '',
-    description: deck?.description || ''
+    description: deck?.description || '',
+    color: deck?.color || '#ffcb91'
   });
 
   useEffect(() => {
     if (deck) {
       setFormData({
         title: deck.title || '',
-        description: deck.description || ''
+        description: deck.description || '',
+        color: deck.color || '#ffcb91'
       });
     }
   }, [deck]);
@@ -38,6 +41,13 @@ function DeckEditForm({ deck, onSubmit, onCancel }) {
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleColorChange = (color) => {
+    setFormData(prev => ({
+      ...prev,
+      color: color
     }));
   };
 
@@ -76,6 +86,13 @@ function DeckEditForm({ deck, onSubmit, onCancel }) {
             onChange={handleChange}
           />
         </div>
+        <div className="form-group">
+          <label htmlFor="color">Deck Color:</label>
+          <ColorSelector 
+            selectedColor={formData.color}
+            onChange={handleColorChange}
+          />
+        </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-save">Save Changes</button>
           <button 
@@ -95,7 +112,8 @@ function DeckEditForm({ deck, onSubmit, onCancel }) {
 function AddDeckForm({ onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     title: '',
-    description: ''
+    description: '',
+    color: '#ffcb91' // Default color
   });
 
   const handleChange = (e) => {
@@ -103,6 +121,13 @@ function AddDeckForm({ onSubmit, onCancel }) {
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleColorChange = (color) => {
+    setFormData(prev => ({
+      ...prev,
+      color: color
     }));
   };
 
@@ -143,6 +168,14 @@ function AddDeckForm({ onSubmit, onCancel }) {
           />
         </div>
         
+        <div className="form-group">
+          <label htmlFor="deck-color">Deck Color:</label>
+          <ColorSelector 
+            selectedColor={formData.color}
+            onChange={handleColorChange}
+          />
+        </div>
+        
         <div className="form-actions">
           <button type="submit" className="btn btn-submit">Create Nested Deck</button>
           <button type="button" className="btn btn-cancel" onClick={onCancel}>
@@ -156,8 +189,12 @@ function AddDeckForm({ onSubmit, onCancel }) {
 
 // Deck header component
 function DeckHeader({ deck, onEditClick }) {
+  const folderStyle = {
+    backgroundColor: deck.color || '#ffcb91'
+  };
+
   return (
-    <div className="deck-header folder-style">
+    <div className="deck-header folder-style" style={folderStyle}>
       <h1>
         <span className="folder-icon">📁</span>
         {deck.title}
@@ -225,6 +262,8 @@ function DeckPage() {
   const [childDecks, setChildDecks] = useState([]);
   const [breadcrumbPath, setBreadcrumbPath] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  // Add error state (was missing)
+  const [error, setError] = useState(null);
   
   // State for form management
   const [activeForm, setActiveForm] = useState(null);
@@ -234,6 +273,7 @@ function DeckPage() {
   const loadDeck = async () => {
     try {
       setIsLoading(true);
+      setError(null); // Reset error state
       // Get the current deck
       const deckData = await getDeck(deckId);
       if (!deckData) {
@@ -251,6 +291,7 @@ function DeckPage() {
       setBreadcrumbPath(path);
     } catch (error) {
       console.error('Failed to load deck:', error);
+      setError('Failed to load deck information');
     } finally {
       setIsLoading(false);
     }
@@ -270,21 +311,27 @@ function DeckPage() {
     if (!cardData) return false;
     
     try {
+      setError(null);
       const updatedDeck = await addCardToDeck(deckId, cardData);
       setDeck(updatedDeck);
       return true;
     } catch (error) {
       console.error('Failed to add card:', error);
+      setError('Failed to add card');
       return false;
     }
   };
 
   const handleDeleteCard = async (cardId) => {
     try {
+      setError(null);
       const updatedDeck = await deleteCardFromDeck(deckId, cardId);
       setDeck(updatedDeck);
+      return true;
     } catch (error) {
       console.error('Failed to delete card:', error);
+      setError('Failed to delete card');
+      return false;
     }
   };
   
@@ -292,6 +339,7 @@ function DeckPage() {
     if (!updatedCardData) return false;
     
     try {
+      setError(null);
       const updatedDeck = await updateCardInDeck(
         deckId, 
         updatedCardData.id, 
@@ -301,6 +349,7 @@ function DeckPage() {
       return true;
     } catch (error) {
       console.error('Failed to update card:', error);
+      setError('Failed to update card');
       return false;
     }
   };
@@ -312,6 +361,7 @@ function DeckPage() {
     }
     
     try {
+      setError(null);
       await deleteDeck(deckId);
       // Navigate to parent deck if available, otherwise to home
       if (deck.parentId) {
@@ -322,23 +372,27 @@ function DeckPage() {
       return true;
     } catch (error) {
       console.error('Failed to delete deck:', error);
+      setError('Failed to delete deck');
       return false;
     }
   };
   
   const handleCreateNestedDeck = async (deckData) => {
     try {
+      setError(null);
       await createDeck(deckData, deckId);
       await loadDeck(); // Reload to show new child deck
       return true;
     } catch (error) {
       console.error('Failed to create nested deck:', error);
+      setError('Failed to create nested deck');
       return false;
     }
   };
 
   const handleUpdateDeckInfo = async (updatedData) => {
     try {
+      setError(null);
       const updatedDeck = await updateDeck(deckId, updatedData);
       setDeck(updatedDeck);
       
@@ -352,7 +406,7 @@ function DeckPage() {
       return true;
     } catch (error) {
       console.error('Failed to update deck:', error);
-      alert('Failed to update deck. Please try again.');
+      setError('Failed to update deck. Please try again.');
       return false;
     }
   };
@@ -409,6 +463,8 @@ function DeckPage() {
   return (
     <div className="deck-page">
       <Breadcrumb path={breadcrumbPath} />
+      
+      {error && <div className="error-message">{error}</div>}
       
       {activeForm === 'edit-deck' ? (
         <DeckEditForm 

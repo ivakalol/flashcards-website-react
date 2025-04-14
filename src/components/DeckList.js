@@ -1,39 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { deleteDeck, getChildDecksCount, updateDeck } from '../services/deckService';
+import { updateDeck, deleteDeck } from '../services/deckService';
+import ColorSelector from './ColorSelector';
 import '../styles/DeckList.css';
 
-function DeckList({ decks, onDelete, onUpdate }) {
-  // State to track child deck counts
-  const [deckCounts, setDeckCounts] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+const DeckList = ({ decks, isLoading = false, onDelete, onUpdate }) => {
   const [editingDeck, setEditingDeck] = useState(null);
   const [editFormData, setEditFormData] = useState({
     title: '',
-    description: ''
+    description: '',
+    color: ''
   });
-  
-  // Load child deck counts when deck list changes
-  useEffect(() => {
-    const loadChildCounts = async () => {
-      const counts = {};
-      
-      for (const deck of decks) {
-        counts[deck.id] = await getChildDecksCount(deck.id);
-      }
-      
-      setDeckCounts(counts);
-      setIsLoading(false);
-    };
-    
-    if (decks.length > 0) {
-      loadChildCounts();
-    } else {
-      setIsLoading(false);
-    }
-  }, [decks]);
 
-  // Handle deletion and refresh the decks list
+  // Handle delete button click
   const handleDeleteDeck = async (deckId, e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -54,7 +33,8 @@ function DeckList({ decks, onDelete, onUpdate }) {
     setEditingDeck(deck);
     setEditFormData({
       title: deck.title || '',
-      description: deck.description || ''
+      description: deck.description || '',
+      color: deck.color || '#ffcb91' // Default if color not set
     });
   };
 
@@ -64,6 +44,14 @@ function DeckList({ decks, onDelete, onUpdate }) {
     setEditFormData({
       ...editFormData,
       [name]: value
+    });
+  };
+  
+  // Handle color selection
+  const handleColorChange = (color) => {
+    setEditFormData({
+      ...editFormData,
+      color: color
     });
   };
 
@@ -80,7 +68,8 @@ function DeckList({ decks, onDelete, onUpdate }) {
       // Update the deck
       await updateDeck(editingDeck.id, {
         title: editFormData.title,
-        description: editFormData.description
+        description: editFormData.description,
+        color: editFormData.color
       });
       
       // Notify parent component to refresh
@@ -111,7 +100,11 @@ function DeckList({ decks, onDelete, onUpdate }) {
   return (
     <div className="deck-list">
       {decks.map(deck => (
-        <div key={deck.id} className="deck-card">
+        <div 
+          key={deck.id} 
+          className="deck-card"
+          style={{ backgroundColor: deck.color || '#ffcb91' }}
+        >
           {editingDeck && editingDeck.id === deck.id ? (
             <div className="deck-edit-form">
               <form onSubmit={handleEditFormSubmit}>
@@ -135,6 +128,13 @@ function DeckList({ decks, onDelete, onUpdate }) {
                     onChange={handleEditFormChange}
                   />
                 </div>
+                <div className="form-group">
+                  <label htmlFor={`color-${deck.id}`}>Deck Color:</label>
+                  <ColorSelector 
+                    selectedColor={editFormData.color}
+                    onChange={handleColorChange}
+                  />
+                </div>
                 <div className="deck-edit-actions">
                   <button type="submit" className="btn btn-save">Save</button>
                   <button 
@@ -154,9 +154,6 @@ function DeckList({ decks, onDelete, onUpdate }) {
               <div className="deck-stats">
                 <span className="stat-item">
                   <i className="stat-icon card-icon">📝</i> {deck.cards.length} cards
-                </span>
-                <span className="stat-item">
-                  <i className="stat-icon folder-icon">📁</i> {deckCounts[deck.id] || 0} nested decks
                 </span>
               </div>
               <div className="deck-actions">
@@ -182,6 +179,6 @@ function DeckList({ decks, onDelete, onUpdate }) {
       ))}
     </div>
   );
-}
+};
 
 export default DeckList;

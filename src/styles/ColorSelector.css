@@ -1,0 +1,46 @@
+.color-selector {
+    margin-bottom: 1.5rem;
+  }
+  
+  .color-selector label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #495057;
+  }
+  
+  .color-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+  
+  .color-option:hover {
+    transform: scale(1.1);
+  }
+  
+  .color-option.selected {
+    border: 2px solid #333;
+    box-shadow: 0 0 0 2px white inset;
+  }
+  
+  .color-option.selected:after {
+    content: '✓';
+    position: absolute;
+    color: #333;
+    font-size: 16px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+  }

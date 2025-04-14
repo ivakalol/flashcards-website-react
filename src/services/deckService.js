@@ -8,6 +8,7 @@ const initialDecks = [
     title: 'JavaScript Basics',
     description: 'Fundamental concepts of JavaScript programming',
     parentId: null, // Top-level deck
+    color: '#ffcb91', // Default color (light orange)
     cards: [
       { id: '101', question: 'What is JavaScript?', answer: 'A programming language that enables interactive web pages' },
       { id: '102', question: 'What is a variable?', answer: 'A container that stores a value' }
@@ -18,6 +19,7 @@ const initialDecks = [
     title: 'React Fundamentals',
     description: 'Core concepts of the React library',
     parentId: null, // Top-level deck
+    color: '#a8dadc', // Default color (light blue)
     cards: [
       { id: '201', question: 'What is JSX?', answer: 'A syntax extension for JavaScript that looks similar to HTML' },
       { id: '202', question: 'What is a React component?', answer: 'A reusable piece of code that returns React elements describing what should appear on the screen' }
@@ -107,6 +109,7 @@ export const createDeck = async (deckData, parentId = null) => {
     ...deckData,
     id: deckUtils.generateId(),
     parentId: parentId,
+    color: deckData.color || '#ffcb91', // Default color if not provided
     cards: []
   };
   
@@ -146,6 +149,7 @@ export const updateDeck = async (deckId, deckData) => {
     // Preserve these properties unless explicitly provided
     parentId: deckData.parentId !== undefined ? deckData.parentId : decks[deckIndex].parentId,
     cards: deckData.cards || decks[deckIndex].cards,
+    color: deckData.color || decks[deckIndex].color, // Preserve color if not provided
     id: deckId // Ensure ID doesn't change
   };
   

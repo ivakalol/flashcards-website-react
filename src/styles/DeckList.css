@@ -261,29 +261,8 @@
   color: #6c757d;
 }
 
-/* Folder color variations */
-.deck-card:nth-child(3n+1) {
-  background-color: #ffcb91; /* Light orange */
-}
-
-.deck-card:nth-child(3n+1):before {
-  background-color: #ffcb91;
-}
-
-.deck-card:nth-child(3n+2) {
-  background-color: #a8dadc; /* Light blue */
-}
-
-.deck-card:nth-child(3n+2):before {
-  background-color: #a8dadc;
-}
-
-.deck-card:nth-child(3n+3) {
-  background-color: #ffd868; /* Yellow */
-}
-
-.deck-card:nth-child(3n+3):before {
-  background-color: #ffd868;
+.deck-card:before {
+  background-color: inherit;
 }
 
 /* Responsive Adjustments */
