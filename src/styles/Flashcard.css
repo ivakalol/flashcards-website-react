@@ -156,11 +156,6 @@
   margin-top: auto;
 }
 
-.flashcard:focus {
-  outline: 2px solid #3498db;
-  outline-offset: 2px;
-}
-
 .flashcard-actions button:focus {
   outline: 2px solid #fff;
   outline-offset: 2px;
