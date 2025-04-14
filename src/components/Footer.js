@@ -2,9 +2,15 @@ import React from 'react';
 import '../styles/Footer.css';
 
 function Footer() {
+  const currentYear = new Date().getFullYear();
+  
   return (
-    <footer className="footer">
-      <p>&copy; {new Date().getFullYear()} - Schatz Cards - All rights reserved.</p>
+    <footer className="footer" role="contentinfo">
+      <div className="footer-content">
+        <p className="copyright">
+          &copy; {currentYear} - Schatz Cards - All rights reserved.
+        </p>
+      </div>
     </footer>
   );
 }

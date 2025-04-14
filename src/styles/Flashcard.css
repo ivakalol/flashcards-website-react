@@ -134,6 +134,38 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 1rem;
+}
+
+.card-text {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.card-hint {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  font-style: italic;
+  margin-top: auto;
+}
+
+.flashcard:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+.flashcard-actions button:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
 /* Add responsive adjustments */
 @media (max-width: 768px) {
   .flashcard {

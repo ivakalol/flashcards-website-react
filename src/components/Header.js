@@ -1,17 +1,32 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import '../styles/Header.css';
 
 function Header() {
   return (
     <header className="header">
       <div className="logo">
-        <Link to="/">Flashcards</Link>
+        <Link to="/" aria-label="Flashcards Home">Flashcards</Link>
       </div>
-      <nav className="nav">
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/create">Create Deck</Link></li>
+      <nav className="nav" aria-label="Main Navigation">
+        <ul className="nav-list">
+          <li className="nav-item">
+            <NavLink 
+              to="/" 
+              className={({ isActive }) => isActive ? "active" : ""}
+              end
+            >
+              Home
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink 
+              to="/create" 
+              className={({ isActive }) => isActive ? "active" : ""}
+            >
+              Create Deck
+            </NavLink>
+          </li>
         </ul>
       </nav>
     </header>

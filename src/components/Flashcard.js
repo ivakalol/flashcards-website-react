@@ -1,5 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import '../styles/Flashcard.css';
+
+// Component for action buttons to avoid duplication
+const CardActions = ({ onEdit, onDelete }) => (
+  <div className="flashcard-actions">
+    <button 
+      className="flashcard-edit-btn visible" 
+      onClick={onEdit}
+      title="Edit card"
+      aria-label="Edit card"
+    >
+      ✎
+    </button>
+    <button 
+      className="flashcard-delete-btn visible" 
+      onClick={onDelete}
+      title="Delete card"
+      aria-label="Delete card"
+    >
+      ×
+    </button>
+  </div>
+);
 
 function Flashcard({ card, onDelete, onEdit, isInStudyMode = false }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -24,56 +47,69 @@ function Flashcard({ card, onDelete, onEdit, isInStudyMode = false }) {
     e.stopPropagation(); // Prevent flipping the card
     onEdit(card);
   };
+  
+  const handleKeyDown = (e) => {
+    // Toggle card on Enter or Space key
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setIsFlipped(!isFlipped);
+    }
+  };
 
   return (
-    <div className={`flashcard ${isFlipped ? 'flipped' : ''}`} onClick={handleCardClick}>
+    <div 
+      className={`flashcard ${isFlipped ? 'flipped' : ''}`} 
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`Flashcard: ${isFlipped ? 'Answer' : 'Question'}`}
+    >
       <div className="flashcard-inner">
         <div className="flashcard-front">
-          <p>{card.question}</p>
+          <div className="card-content">
+            <p className="card-text">{card.question}</p>
+            <span className="card-hint">Click to reveal answer</span>
+          </div>
           {!isInStudyMode && (
-            <div className="flashcard-actions">
-              {/* Make edit button always visible */}
-              <button 
-                className="flashcard-edit-btn visible" 
-                onClick={handleEditClick}
-                title="Edit card"
-              >
-                ✎
-              </button>
-              <button 
-                className="flashcard-delete-btn visible" 
-                onClick={handleDeleteClick}
-                title="Delete card"
-              >
-                ×
-              </button>
-            </div>
+            <CardActions 
+              onEdit={handleEditClick} 
+              onDelete={handleDeleteClick} 
+            />
           )}
         </div>
         <div className="flashcard-back">
-          <p>{card.answer}</p>
+          <div className="card-content">
+            <p className="card-text">{card.answer}</p>
+            <span className="card-hint">Click to see question</span>
+          </div>
           {!isInStudyMode && (
-            <div className="flashcard-actions">
-              <button 
-                className="flashcard-edit-btn visible" 
-                onClick={handleEditClick}
-                title="Edit card"
-              >
-                ✎
-              </button>
-              <button 
-                className="flashcard-delete-btn visible" 
-                onClick={handleDeleteClick}
-                title="Delete card"
-              >
-                ×
-              </button>
-            </div>
+            <CardActions 
+              onEdit={handleEditClick} 
+              onDelete={handleDeleteClick} 
+            />
           )}
         </div>
       </div>
     </div>
   );
 }
+
+Flashcard.propTypes = {
+  card: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    question: PropTypes.string.isRequired,
+    answer: PropTypes.string.isRequired,
+  }).isRequired,
+  onDelete: PropTypes.func,
+  onEdit: PropTypes.func,
+  isInStudyMode: PropTypes.bool
+};
+
+Flashcard.defaultProps = {
+  onDelete: () => {},
+  onEdit: () => {},
+  isInStudyMode: false
+};
 
 export default Flashcard;

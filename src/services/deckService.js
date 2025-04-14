@@ -1,5 +1,5 @@
-// This service would interact with your backend if you have one.
-// For now, we'll use localStorage to store deck data.
+// Constants
+const STORAGE_KEY = 'flashcards_decks';
 
 // Sample initial data with nested deck structure
 const initialDecks = [
@@ -25,17 +25,46 @@ const initialDecks = [
   }
 ];
 
-// Initialize localStorage with sample data if empty
-const initializeDecks = () => {
-  if (!localStorage.getItem('flashcards_decks')) {
-    localStorage.setItem('flashcards_decks', JSON.stringify(initialDecks));
+// Utility functions for storage operations
+const storage = {
+  initialize: () => {
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialDecks));
+    }
+  },
+  
+  getAll: () => {
+    storage.initialize();
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  },
+  
+  save: (decks) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(decks));
   }
+};
+
+// Utility functions for deck operations
+const deckUtils = {
+  findDeckIndex: (decks, deckId) => {
+    const index = decks.findIndex(deck => deck.id === deckId);
+    if (index === -1) {
+      throw new Error(`Deck with ID ${deckId} not found`);
+    }
+    return index;
+  },
+  
+  updateDeckInList: (decks, deckIndex, updatedDeck) => [
+    ...decks.slice(0, deckIndex),
+    updatedDeck,
+    ...decks.slice(deckIndex + 1)
+  ],
+  
+  generateId: () => Date.now().toString()
 };
 
 // Get all decks
 export const getDecks = async () => {
-  initializeDecks();
-  return JSON.parse(localStorage.getItem('flashcards_decks') || '[]');
+  return storage.getAll();
 };
 
 // Get decks by parent ID (null for top-level decks)
@@ -76,27 +105,23 @@ export const createDeck = async (deckData, parentId = null) => {
   const decks = await getDecks();
   const newDeck = {
     ...deckData,
-    id: Date.now().toString(),
+    id: deckUtils.generateId(),
     parentId: parentId,
     cards: []
   };
   
-  localStorage.setItem('flashcards_decks', JSON.stringify([...decks, newDeck]));
+  storage.save([...decks, newDeck]);
   return newDeck;
 };
 
 // Add a card to a deck
 export const addCardToDeck = async (deckId, cardData) => {
   const decks = await getDecks();
-  const deckIndex = decks.findIndex(deck => deck.id === deckId);
-  
-  if (deckIndex === -1) {
-    throw new Error('Deck not found');
-  }
+  const deckIndex = deckUtils.findDeckIndex(decks, deckId);
   
   const newCard = {
     ...cardData,
-    id: Date.now().toString()
+    id: deckUtils.generateId()
   };
   
   const updatedDeck = {
@@ -104,41 +129,29 @@ export const addCardToDeck = async (deckId, cardData) => {
     cards: [...decks[deckIndex].cards, newCard]
   };
   
-  const updatedDecks = [
-    ...decks.slice(0, deckIndex),
-    updatedDeck,
-    ...decks.slice(deckIndex + 1)
-  ];
+  const updatedDecks = deckUtils.updateDeckInList(decks, deckIndex, updatedDeck);
+  storage.save(updatedDecks);
   
-  localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
   return updatedDeck;
 };
 
 // Update a deck
 export const updateDeck = async (deckId, deckData) => {
   const decks = await getDecks();
-  const deckIndex = decks.findIndex(deck => deck.id === deckId);
-  
-  if (deckIndex === -1) {
-    throw new Error('Deck not found');
-  }
+  const deckIndex = deckUtils.findDeckIndex(decks, deckId);
   
   const updatedDeck = {
     ...decks[deckIndex],
     ...deckData,
-    // Don't override these properties unless explicitly provided
+    // Preserve these properties unless explicitly provided
     parentId: deckData.parentId !== undefined ? deckData.parentId : decks[deckIndex].parentId,
     cards: deckData.cards || decks[deckIndex].cards,
     id: deckId // Ensure ID doesn't change
   };
   
-  const updatedDecks = [
-    ...decks.slice(0, deckIndex),
-    updatedDeck,
-    ...decks.slice(deckIndex + 1)
-  ];
+  const updatedDecks = deckUtils.updateDeckInList(decks, deckIndex, updatedDeck);
+  storage.save(updatedDecks);
   
-  localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
   return updatedDeck;
 };
 
@@ -166,49 +179,37 @@ export const deleteDeck = async (deckId) => {
   
   // Filter out the decks to delete
   const updatedDecks = decks.filter(deck => !allDeckIdsToDelete.includes(deck.id));
-  localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
+  storage.save(updatedDecks);
 };
 
 // Delete a card from a deck
 export const deleteCardFromDeck = async (deckId, cardId) => {
   const decks = await getDecks();
-  const deckIndex = decks.findIndex(deck => deck.id === deckId);
-  
-  if (deckIndex === -1) {
-    throw new Error('Deck not found');
-  }
+  const deckIndex = deckUtils.findDeckIndex(decks, deckId);
   
   const updatedDeck = {
     ...decks[deckIndex],
     cards: decks[deckIndex].cards.filter(card => card.id !== cardId)
   };
   
-  const updatedDecks = [
-    ...decks.slice(0, deckIndex),
-    updatedDeck,
-    ...decks.slice(deckIndex + 1)
-  ];
+  const updatedDecks = deckUtils.updateDeckInList(decks, deckIndex, updatedDeck);
+  storage.save(updatedDecks);
   
-  localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
   return updatedDeck;
 };
 
 // Update a card in a deck
 export const updateCardInDeck = async (deckId, cardId, cardData) => {
   const decks = await getDecks();
-  const deckIndex = decks.findIndex(deck => deck.id === deckId);
+  const deckIndex = deckUtils.findDeckIndex(decks, deckId);
+  const deck = decks[deckIndex];
   
-  if (deckIndex === -1) {
-    throw new Error('Deck not found');
-  }
-  
-  const cardIndex = decks[deckIndex].cards.findIndex(card => card.id === cardId);
-  
+  const cardIndex = deck.cards.findIndex(card => card.id === cardId);
   if (cardIndex === -1) {
-    throw new Error('Card not found');
+    throw new Error(`Card with ID ${cardId} not found in deck ${deckId}`);
   }
   
-  const updatedCards = [...decks[deckIndex].cards];
+  const updatedCards = [...deck.cards];
   updatedCards[cardIndex] = {
     ...updatedCards[cardIndex],
     question: cardData.question,
@@ -216,17 +217,13 @@ export const updateCardInDeck = async (deckId, cardId, cardData) => {
   };
   
   const updatedDeck = {
-    ...decks[deckIndex],
+    ...deck,
     cards: updatedCards
   };
   
-  const updatedDecks = [
-    ...decks.slice(0, deckIndex),
-    updatedDeck,
-    ...decks.slice(deckIndex + 1)
-  ];
+  const updatedDecks = deckUtils.updateDeckInList(decks, deckIndex, updatedDeck);
+  storage.save(updatedDecks);
   
-  localStorage.setItem('flashcards_decks', JSON.stringify(updatedDecks));
   return updatedDeck;
 };
 

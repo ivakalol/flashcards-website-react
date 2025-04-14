@@ -4,29 +4,233 @@ import Flashcard from '../components/Flashcard';
 import CardForm from '../components/CardForm';
 import DeckList from '../components/DeckList';
 import Breadcrumb from '../components/Breadcrumb';
-import { getDeck, getDecksByParentId, getDeckPath, addCardToDeck, deleteCardFromDeck, updateCardInDeck, deleteDeck, createDeck, updateDeck } from '../services/deckService';
+import { 
+  getDeck, 
+  getDecksByParentId, 
+  getDeckPath, 
+  addCardToDeck, 
+  deleteCardFromDeck, 
+  updateCardInDeck, 
+  deleteDeck, 
+  createDeck, 
+  updateDeck 
+} from '../services/deckService';
 import '../styles/DeckPage.css';
 
-function DeckPage() {
-  const { deckId } = useParams();
-  const navigate = useNavigate();
-  const [deck, setDeck] = useState(null);
-  const [childDecks, setChildDecks] = useState([]);
-  const [breadcrumbPath, setBreadcrumbPath] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [showAddDeckForm, setShowAddDeckForm] = useState(false);
-  const [editingDeck, setEditingDeck] = useState(false);
-  const [editingCard, setEditingCard] = useState(null);
-  const [newDeckTitle, setNewDeckTitle] = useState('');
-  const [newDeckDescription, setNewDeckDescription] = useState('');
-  const [editDeckData, setEditDeckData] = useState({
+// Component for editing deck info
+function DeckEditForm({ deck, onSubmit, onCancel }) {
+  const [formData, setFormData] = useState({
+    title: deck?.title || '',
+    description: deck?.description || ''
+  });
+
+  useEffect(() => {
+    if (deck) {
+      setFormData({
+        title: deck.title || '',
+        description: deck.description || ''
+      });
+    }
+  }, [deck]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!formData.title.trim()) {
+      alert('Deck title is required');
+      return;
+    }
+    
+    onSubmit(formData);
+  };
+
+  return (
+    <div className="edit-deck-section">
+      <h2>Edit Deck</h2>
+      <form onSubmit={handleSubmit} className="edit-deck-form">
+        <div className="form-group">
+          <label htmlFor="title">Title:</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="description">Description:</label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-save">Save Changes</button>
+          <button 
+            type="button" 
+            className="btn btn-cancel"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// Component for adding a new nested deck
+function AddDeckForm({ onSubmit, onCancel }) {
+  const [formData, setFormData] = useState({
     title: '',
     description: ''
   });
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!formData.title.trim()) {
+      alert('Deck title is required');
+      return;
+    }
+    
+    onSubmit(formData);
+  };
+
+  return (
+    <div className="add-deck-section">
+      <h2>Add Nested Deck</h2>
+      <form onSubmit={handleSubmit} className="create-deck-form">
+        <div className="form-group">
+          <label htmlFor="deck-title">Deck Title:</label>
+          <input
+            type="text"
+            id="deck-title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="deck-description">Description:</label>
+          <textarea
+            id="deck-description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+          />
+        </div>
+        
+        <div className="form-actions">
+          <button type="submit" className="btn btn-submit">Create Nested Deck</button>
+          <button type="button" className="btn btn-cancel" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// Deck header component
+function DeckHeader({ deck, onEditClick }) {
+  return (
+    <div className="deck-header">
+      <h1>{deck.title}</h1>
+      <button 
+        className="btn-icon btn-edit-icon" 
+        onClick={onEditClick}
+        title="Edit deck"
+      >
+        ✎
+      </button>
+    </div>
+  );
+}
+
+// Action buttons component
+function DeckActionButtons({ 
+  deckId, 
+  activeForm, 
+  setActiveForm, 
+  hasEditingCard, 
+  onDeleteDeck 
+}) {
+  const getButtonDisabled = (formType) => {
+    return activeForm !== null && activeForm !== formType || hasEditingCard;
+  };
+  
+  return (
+    <div className="deck-actions">
+      <Link to={`/study/${deckId}`} className="btn btn-primary">Study Deck</Link>
+      <button 
+        className="btn btn-secondary"
+        onClick={() => activeForm === 'add-card' 
+          ? setActiveForm(null) 
+          : setActiveForm('add-card')}
+        disabled={getButtonDisabled('add-card')}
+      >
+        {activeForm === 'add-card' ? 'Cancel' : 'Add Card'}
+      </button>
+      <button 
+        className="btn btn-secondary"
+        onClick={() => activeForm === 'add-deck' 
+          ? setActiveForm(null) 
+          : setActiveForm('add-deck')}
+        disabled={getButtonDisabled('add-deck')}
+      >
+        {activeForm === 'add-deck' ? 'Cancel' : 'Add Nested Deck'}
+      </button>
+      <button 
+        className="btn btn-delete"
+        onClick={onDeleteDeck}
+      >
+        Delete Deck
+      </button>
+    </div>
+  );
+}
+
+function DeckPage() {
+  const { deckId } = useParams();
+  const navigate = useNavigate();
+  
+  // State for deck data
+  const [deck, setDeck] = useState(null);
+  const [childDecks, setChildDecks] = useState([]);
+  const [breadcrumbPath, setBreadcrumbPath] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // State for form management
+  const [activeForm, setActiveForm] = useState(null);
+  const [editingCard, setEditingCard] = useState(null);
+
+  // Load deck data
   const loadDeck = async () => {
     try {
+      setIsLoading(true);
       // Get the current deck
       const deckData = await getDeck(deckId);
       if (!deckData) {
@@ -49,32 +253,26 @@ function DeckPage() {
     }
   };
 
+  // Load data on component mount and when deckId changes
   useEffect(() => {
     loadDeck();
-  }, [deckId, navigate]);
+    // Reset form states when deck changes
+    setActiveForm(null);
+    setEditingCard(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deckId]);
 
-  // Initialize edit form values when deck data is loaded
-  useEffect(() => {
-    if (deck) {
-      setEditDeckData({
-        title: deck.title || '',
-        description: deck.description || ''
-      });
-    }
-  }, [deck]);
-
+  // Card operations
   const handleAddCard = async (cardData) => {
-    if (!cardData) {
-      setShowAddForm(false);
-      return;
-    }
+    if (!cardData) return false;
     
     try {
       const updatedDeck = await addCardToDeck(deckId, cardData);
       setDeck(updatedDeck);
-      setShowAddForm(false);
+      return true;
     } catch (error) {
       console.error('Failed to add card:', error);
+      return false;
     }
   };
 
@@ -87,137 +285,115 @@ function DeckPage() {
     }
   };
   
-  const handleEditCard = (card) => {
-    setEditingCard(card);
-    setShowAddForm(false);
-    setShowAddDeckForm(false);
-    setEditingDeck(false);
-  };
-  
   const handleUpdateCard = async (updatedCardData) => {
-    if (!updatedCardData) {
-      setEditingCard(null);
-      return;
-    }
+    if (!updatedCardData) return false;
     
     try {
-      const updatedDeck = await updateCardInDeck(deckId, updatedCardData.id, updatedCardData);
+      const updatedDeck = await updateCardInDeck(
+        deckId, 
+        updatedCardData.id, 
+        updatedCardData
+      );
       setDeck(updatedDeck);
-      setEditingCard(null);
+      return true;
     } catch (error) {
       console.error('Failed to update card:', error);
+      return false;
     }
   };
   
+  // Deck operations
   const handleDeleteDeck = async () => {
-    if (window.confirm(`Are you sure you want to delete "${deck.title}" and all its contents? This action cannot be undone.`)) {
-      try {
-        await deleteDeck(deckId);
-        // Navigate to parent deck if available, otherwise to home
-        if (deck.parentId) {
-          navigate(`/deck/${deck.parentId}`);
-        } else {
-          navigate('/');
-        }
-      } catch (error) {
-        console.error('Failed to delete deck:', error);
-      }
-    }
-  };
-  
-  const handleChildDeckDeleted = () => {
-    loadDeck(); // Reload child decks
-  };
-
-  const handleChildDeckUpdated = () => {
-    loadDeck(); // Reload child decks after update
-  };
-  
-  const handleCreateNestedDeck = async (e) => {
-    e.preventDefault();
-    
-    if (!newDeckTitle.trim()) {
-      alert('Deck title is required');
-      return;
+    if (!window.confirm(`Are you sure you want to delete "${deck.title}" and all its contents? This action cannot be undone.`)) {
+      return false;
     }
     
     try {
-      await createDeck({
-        title: newDeckTitle,
-        description: newDeckDescription
-      }, deckId); // Pass current deck ID as parent
-      
-      setNewDeckTitle('');
-      setNewDeckDescription('');
-      setShowAddDeckForm(false);
-      loadDeck(); // Reload to show new child deck
+      await deleteDeck(deckId);
+      // Navigate to parent deck if available, otherwise to home
+      if (deck.parentId) {
+        navigate(`/deck/${deck.parentId}`);
+      } else {
+        navigate('/');
+      }
+      return true;
+    } catch (error) {
+      console.error('Failed to delete deck:', error);
+      return false;
+    }
+  };
+  
+  const handleCreateNestedDeck = async (deckData) => {
+    try {
+      await createDeck(deckData, deckId);
+      await loadDeck(); // Reload to show new child deck
+      return true;
     } catch (error) {
       console.error('Failed to create nested deck:', error);
+      return false;
     }
   };
 
-  // Handle edit deck button click
-  const toggleEditDeck = () => {
-    setEditingDeck(!editingDeck);
-    if (showAddForm) setShowAddForm(false);
-    if (showAddDeckForm) setShowAddDeckForm(false);
-    if (editingCard) setEditingCard(null);
-  };
-
-  // Handle edit deck form changes
-  const handleEditDeckChange = (e) => {
-    const { name, value } = e.target;
-    setEditDeckData({
-      ...editDeckData,
-      [name]: value
-    });
-  };
-
-  // Handle edit deck form submission
-  const handleEditDeckSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!editDeckData.title.trim()) {
-      alert('Deck title is required');
-      return;
-    }
-    
+  const handleUpdateDeckInfo = async (updatedData) => {
     try {
-      const updatedDeck = await updateDeck(deckId, {
-        title: editDeckData.title,
-        description: editDeckData.description
-      });
-      
+      const updatedDeck = await updateDeck(deckId, updatedData);
       setDeck(updatedDeck);
-      setEditingDeck(false);
       
       // Update breadcrumbs path with new title
       const updatedPath = breadcrumbPath.map(item => 
         item.id === deckId 
-          ? { ...item, title: editDeckData.title } 
+          ? { ...item, title: updatedData.title } 
           : item
       );
       setBreadcrumbPath(updatedPath);
+      return true;
     } catch (error) {
       console.error('Failed to update deck:', error);
       alert('Failed to update deck. Please try again.');
+      return false;
+    }
+  };
+  
+  // Form handlers
+  const handleEditCard = (card) => {
+    setEditingCard(card);
+    setActiveForm(null);
+  };
+  
+  const handleCardFormSubmit = async (cardData) => {
+    if (!cardData) {
+      setEditingCard(null);
+      return;
+    }
+    
+    let success;
+    if (editingCard) {
+      success = await handleUpdateCard({...cardData, id: editingCard.id});
+    } else {
+      success = await handleAddCard(cardData);
+    }
+    
+    if (success) {
+      setEditingCard(null);
+      setActiveForm(null);
+    }
+  };
+  
+  const handleEditDeckSubmit = async (formData) => {
+    const success = await handleUpdateDeckInfo(formData);
+    if (success) {
+      setActiveForm(null);
+    }
+  };
+  
+  const handleNewDeckSubmit = async (formData) => {
+    const success = await handleCreateNestedDeck(formData);
+    if (success) {
+      setActiveForm(null);
     }
   };
 
-  const toggleAddForm = () => {
-    setShowAddForm(!showAddForm);
-    if (editingCard) setEditingCard(null);
-    if (showAddDeckForm) setShowAddDeckForm(false);
-    if (editingDeck) setEditingDeck(false);
-  };
-  
-  const toggleAddDeckForm = () => {
-    setShowAddDeckForm(!showAddDeckForm);
-    if (showAddForm) setShowAddForm(false);
-    if (editingCard) setEditingCard(null);
-    if (editingDeck) setEditingDeck(false);
-  };
-
+  // Render loading and error states
   if (isLoading) {
     return <div className="loading">Loading deck...</div>;
   }
@@ -226,60 +402,25 @@ function DeckPage() {
     return <div className="error">Deck not found</div>;
   }
 
+  // Main render
   return (
     <div className="deck-page">
       <Breadcrumb path={breadcrumbPath} />
       
-      {editingDeck ? (
-        <div className="edit-deck-section">
-          <h2>Edit Deck</h2>
-          <form onSubmit={handleEditDeckSubmit} className="edit-deck-form">
-            <div className="form-group">
-              <label htmlFor="title">Title:</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={editDeckData.title}
-                onChange={handleEditDeckChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="description">Description:</label>
-              <textarea
-                id="description"
-                name="description"
-                value={editDeckData.description}
-                onChange={handleEditDeckChange}
-              />
-            </div>
-            <div className="form-actions">
-              <button type="submit" className="btn btn-save">Save Changes</button>
-              <button 
-                type="button" 
-                className="btn btn-cancel"
-                onClick={toggleEditDeck}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
+      {activeForm === 'edit-deck' ? (
+        <DeckEditForm 
+          deck={deck}
+          onSubmit={handleEditDeckSubmit}
+          onCancel={() => setActiveForm(null)}
+        />
       ) : (
-        <div className="deck-header">
-          <h1>{deck.title}</h1>
-          <button 
-            className="btn-icon btn-edit-icon" 
-            onClick={toggleEditDeck}
-            title="Edit deck"
-          >
-            ✎
-          </button>
-        </div>
+        <DeckHeader 
+          deck={deck}
+          onEditClick={() => setActiveForm('edit-deck')}
+        />
       )}
       
-      {!editingDeck && <p className="deck-description">{deck.description}</p>}
+      {!activeForm && <p className="deck-description">{deck.description}</p>}
       
       <div className="deck-info">
         <div className="deck-stats">
@@ -292,74 +433,36 @@ function DeckPage() {
         </div>
       </div>
       
-      <div className="deck-actions">
-        <Link to={`/study/${deckId}`} className="btn btn-primary">Study Deck</Link>
-        <button 
-          className="btn btn-secondary"
-          onClick={toggleAddForm}
-          disabled={!!editingCard || showAddDeckForm || editingDeck}
-        >
-          {showAddForm ? 'Cancel' : 'Add Card'}
-        </button>
-        <button 
-          className="btn btn-secondary"
-          onClick={toggleAddDeckForm}
-          disabled={!!editingCard || showAddForm || editingDeck}
-        >
-          {showAddDeckForm ? 'Cancel' : 'Add Nested Deck'}
-        </button>
-        <button 
-          className="btn btn-delete"
-          onClick={handleDeleteDeck}
-        >
-          Delete Deck
-        </button>
-      </div>
+      <DeckActionButtons
+        deckId={deckId}
+        activeForm={activeForm}
+        setActiveForm={setActiveForm}
+        hasEditingCard={!!editingCard}
+        onDeleteDeck={handleDeleteDeck}
+      />
 
-      {showAddForm && !editingCard && (
+      {activeForm === 'add-card' && (
         <div className="add-card-section">
           <h2>Add New Card</h2>
           <CardForm 
-            onSubmit={handleAddCard} 
+            onSubmit={handleCardFormSubmit} 
             initialValues={{ question: '', answer: '' }}
           />
         </div>
       )}
       
-      {showAddDeckForm && (
-        <div className="add-deck-section">
-          <h2>Add Nested Deck</h2>
-          <form onSubmit={handleCreateNestedDeck} className="create-deck-form">
-            <div className="form-group">
-              <label htmlFor="title">Deck Title:</label>
-              <input
-                type="text"
-                id="title"
-                value={newDeckTitle}
-                onChange={(e) => setNewDeckTitle(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="description">Description:</label>
-              <textarea
-                id="description"
-                value={newDeckDescription}
-                onChange={(e) => setNewDeckDescription(e.target.value)}
-              />
-            </div>
-            
-            <button type="submit" className="btn btn-submit">Create Nested Deck</button>
-          </form>
-        </div>
+      {activeForm === 'add-deck' && (
+        <AddDeckForm
+          onSubmit={handleNewDeckSubmit}
+          onCancel={() => setActiveForm(null)}
+        />
       )}
       
       {editingCard && (
         <div className="edit-card-section">
           <h2>Edit Card</h2>
           <CardForm 
-            onSubmit={handleUpdateCard} 
+            onSubmit={handleCardFormSubmit} 
             initialValues={editingCard} 
             isEditing={true} 
           />
@@ -371,8 +474,8 @@ function DeckPage() {
           <h2>Nested Decks</h2>
           <DeckList 
             decks={childDecks} 
-            onDelete={handleChildDeckDeleted} 
-            onUpdate={handleChildDeckUpdated}
+            onDelete={loadDeck} 
+            onUpdate={loadDeck}
           />
         </div>
       )}

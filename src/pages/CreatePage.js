@@ -4,26 +4,47 @@ import { createDeck, getDeck } from '../services/deckService';
 import Breadcrumb from '../components/Breadcrumb';
 import '../styles/CreatePage.css';
 
+// Component to show parent deck information
+const ParentDeckInfo = ({ parentDeck }) => (
+  <>
+    <Breadcrumb path={[{ id: parentDeck.id, title: parentDeck.title }]} />
+    <p className="parent-deck-info">
+      Creating a deck inside: <strong>{parentDeck.title}</strong>
+    </p>
+  </>
+);
+
 function CreatePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const parentId = searchParams.get('parentId');
   
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  // Form state
+  const [formData, setFormData] = useState({
+    title: '',
+    description: ''
+  });
+  
+  // UI state
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState('');
   const [parentDeck, setParentDeck] = useState(null);
 
+  // Load parent deck info if parentId is provided
   useEffect(() => {
-    // If parentId is provided, load parent deck info for breadcrumbs
     if (parentId) {
       const loadParentDeck = async () => {
         try {
           const deck = await getDeck(parentId);
+          if (!deck) {
+            // Handle case when parent deck doesn't exist
+            setError('Parent deck not found');
+            return;
+          }
           setParentDeck(deck);
         } catch (error) {
           console.error('Error loading parent deck:', error);
+          setError('Failed to load parent deck information');
         }
       };
       
@@ -31,13 +52,43 @@ function CreatePage() {
     }
   }, [parentId]);
 
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  // Navigate back to appropriate location
+  const handleCancel = () => {
+    if (parentDeck) {
+      navigate(`/deck/${parentId}`);
+    } else {
+      navigate('/');
+    }
+  };
+
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate input
+    if (!formData.title.trim()) {
+      setError('Deck title is required');
+      return;
+    }
+    
     setIsCreating(true);
     setError('');
 
     try {
-      const newDeck = await createDeck({ title, description }, parentId);
+      const newDeck = await createDeck({
+        title: formData.title,
+        description: formData.description
+      }, parentId);
+      
       navigate(`/deck/${newDeck.id}`);
     } catch (error) {
       console.error('Failed to create deck:', error);
@@ -49,16 +100,11 @@ function CreatePage() {
 
   return (
     <div className="create-page">
-      {parentDeck && (
-        <Breadcrumb path={[{ id: parentDeck.id, title: parentDeck.title }]} />
-      )}
+      {parentDeck && <ParentDeckInfo parentDeck={parentDeck} />}
       
       <h1>{parentDeck ? 'Create Nested Deck' : 'Create New Flashcard Deck'}</h1>
-      {parentDeck && (
-        <p className="parent-deck-info">Creating a deck inside: <strong>{parentDeck.title}</strong></p>
-      )}
       
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message" role="alert">{error}</div>}
       
       <form className="create-deck-form" onSubmit={handleSubmit}>
         <div className="form-group">
@@ -66,9 +112,12 @@ function CreatePage() {
           <input
             type="text"
             id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            name="title"
+            value={formData.title}
+            onChange={handleInputChange}
             required
+            autoFocus
+            aria-describedby={error ? "error-message" : undefined}
           />
         </div>
         
@@ -76,8 +125,9 @@ function CreatePage() {
           <label htmlFor="description">Description:</label>
           <textarea
             id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
           />
         </div>
         
@@ -92,7 +142,7 @@ function CreatePage() {
           <button 
             type="button" 
             className="btn btn-secondary"
-            onClick={() => parentDeck ? navigate(`/deck/${parentId}`) : navigate('/')}
+            onClick={handleCancel}
           >
             Cancel
           </button>
