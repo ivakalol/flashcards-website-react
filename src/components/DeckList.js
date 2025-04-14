@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { updateDeck, deleteDeck } from '../services/deckService';
+import { updateDeck, deleteDeck, getChildDecksCount } from '../services/deckService';
 import ColorSelector from './ColorSelector';
 import '../styles/DeckList.css';
 
@@ -11,6 +11,25 @@ const DeckList = ({ decks, isLoading = false, onDelete, onUpdate }) => {
     description: '',
     color: ''
   });
+  const [deckStats, setDeckStats] = useState({});
+
+  // Load child deck counts for each deck
+  useEffect(() => {
+    const loadChildCounts = async () => {
+      const statsPromises = decks.map(async (deck) => {
+        const childCount = await getChildDecksCount(deck.id);
+        return { [deck.id]: childCount };
+      });
+
+      const statsResults = await Promise.all(statsPromises);
+      const combinedStats = statsResults.reduce((acc, stat) => ({...acc, ...stat}), {});
+      setDeckStats(combinedStats);
+    };
+
+    if (decks.length > 0) {
+      loadChildCounts();
+    }
+  }, [decks]);
 
   // Handle delete button click
   const handleDeleteDeck = async (deckId, e) => {
@@ -155,13 +174,20 @@ const DeckList = ({ decks, isLoading = false, onDelete, onUpdate }) => {
                 <span className="stat-item">
                   <i className="stat-icon card-icon">📝</i> {deck.cards.length} cards
                 </span>
+                <span className="stat-item">
+                  <i className="stat-icon folder-icon">📁</i> {deckStats[deck.id] || 0} nested decks
+                </span>
               </div>
               <div className="deck-actions">
-                <Link to={`/deck/${deck.id}`} className="btn btn-view">View</Link>
+                <Link 
+                  to={`/deck/${deck.id}`} 
+                  className="btn btn-primary"
+                >
+                  View
+                </Link>
                 <button 
                   className="btn btn-edit"
                   onClick={(e) => handleEditClick(deck, e)}
-                  title="Edit deck"
                 >
                   Edit
                 </button>
@@ -171,7 +197,6 @@ const DeckList = ({ decks, isLoading = false, onDelete, onUpdate }) => {
                 >
                   Delete
                 </button>
-                <Link to={`/study/${deck.id}`} className="btn btn-study">Study</Link>
               </div>
             </div>
           )}
