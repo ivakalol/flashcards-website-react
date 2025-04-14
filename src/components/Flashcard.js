@@ -56,6 +56,11 @@ function Flashcard({ card, onDelete, onEdit, isInStudyMode = false }) {
     }
   };
 
+  // Function to prevent propagation for scroll events
+  const handleContentScroll = (e) => {
+    e.stopPropagation();
+  };
+
   return (
     <div 
       className={`flashcard ${isFlipped ? 'flipped' : ''}`} 
@@ -68,7 +73,13 @@ function Flashcard({ card, onDelete, onEdit, isInStudyMode = false }) {
       <div className="flashcard-inner">
         <div className="flashcard-front">
           <div className="card-content">
-            <p className="card-text">{card.question}</p>
+            <p 
+              className="card-text" 
+              onWheel={handleContentScroll}
+              onClick={(e) => e.stopPropagation()} // Allow text selection without flipping
+            >
+              {card.question}
+            </p>
             <span className="card-hint">Click to reveal answer</span>
           </div>
           {!isInStudyMode && (
@@ -80,7 +91,13 @@ function Flashcard({ card, onDelete, onEdit, isInStudyMode = false }) {
         </div>
         <div className="flashcard-back">
           <div className="card-content">
-            <p className="card-text">{card.answer}</p>
+            <p 
+              className="card-text" 
+              onWheel={handleContentScroll}
+              onClick={(e) => e.stopPropagation()} // Allow text selection without flipping
+            >
+              {card.answer}
+            </p>
             <span className="card-hint">Click to see question</span>
           </div>
           {!isInStudyMode && (

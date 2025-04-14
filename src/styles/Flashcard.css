@@ -2,7 +2,7 @@
 
 .flashcard {
   position: relative;
-  height: 200px;
+  height: 250px; /* Increased from 200px for more space */
   perspective: 1000px;
   margin-bottom: 1rem;
 }
@@ -34,7 +34,7 @@
   justify-content: center;
   padding: 1.5rem;
   border-radius: 8px;
-  overflow: auto;
+  overflow: hidden; /* Changed from auto to hidden to maintain control over scroll */
   text-align: center;
 }
 
@@ -46,7 +46,7 @@
 
 .flashcard-back {
   background-color: #FFC0CB;
-  color: #3f272b; /* Fixed missing # in color value */
+  color: #3f272b;
   transform: rotateY(180deg);
 }
 
@@ -137,16 +137,23 @@
 .card-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Changed from center to show content from top */
   align-items: center;
   height: 100%;
-  padding: 1rem;
+  width: 100%;
+  padding: 0.5rem;
+  overflow-y: auto; /* Add scroll only to content */
+  scrollbar-width: thin;
 }
 
 .card-text {
   margin: 0 0 1rem;
   font-size: 1.1rem;
-  text-align: center;
+  text-align: left; /* Changed from center to improve readability */
+  width: 100%;
+  max-height: 75%; /* Limit height to ensure hint is visible */
+  overflow-y: auto; /* Enable scrolling for very long content */
+  padding: 0.25rem;
 }
 
 .card-hint {
@@ -154,6 +161,9 @@
   opacity: 0.7;
   font-style: italic;
   margin-top: auto;
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem 0;
 }
 
 .flashcard-actions button:focus {
@@ -161,14 +171,29 @@
   outline-offset: 2px;
 }
 
+/* Custom scrollbar styling */
+.card-text::-webkit-scrollbar {
+  width: 4px;
+}
+
+.card-text::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 10px;
+}
+
+.card-text::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+
 /* Add responsive adjustments */
 @media (max-width: 768px) {
   .flashcard {
-    height: 180px;
+    height: 230px; /* Increased from original mobile height */
   }
   
   .flashcard-content {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   
   .flashcard-actions {
@@ -182,5 +207,16 @@
     width: 28px;
     height: 28px;
     font-size: 14px;
+  }
+}
+
+/* For extra small screens */
+@media (max-width: 480px) {
+  .flashcard {
+    height: 200px;
+  }
+  
+  .card-text {
+    font-size: 0.95rem;
   }
 }

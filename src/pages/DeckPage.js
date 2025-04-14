@@ -157,8 +157,11 @@ function AddDeckForm({ onSubmit, onCancel }) {
 // Deck header component
 function DeckHeader({ deck, onEditClick }) {
   return (
-    <div className="deck-header">
-      <h1>{deck.title}</h1>
+    <div className="deck-header folder-style">
+      <h1>
+        <span className="folder-icon">📁</span>
+        {deck.title}
+      </h1>
       <button 
         className="btn-icon btn-edit-icon" 
         onClick={onEditClick}

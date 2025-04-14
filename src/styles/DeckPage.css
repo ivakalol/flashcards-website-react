@@ -1,174 +1,240 @@
+/* ============================================
+   DeckPage.css - requires common.css import
+   ============================================ */
 
-/* DeckPage.css - importing common.css is required */
-
-/* Page Layout */
-.deck-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-/* Deck Header and Info */
-.deck-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.deck-info {
-  margin-bottom: 1.5rem;
-}
-
-.deck-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  color: #6c757d;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.stat-icon {
-  font-size: 1.3rem;
-}
-
-.deck-description {
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-  color: #6c757d;
-  line-height: 1.5;
-}
-
-/* Deck Actions */
-.deck-actions {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
-
-/* Icon Buttons - specific to deck page */
-.btn-icon {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  transition: background-color 0.2s, transform 0.1s;
-}
-
-.btn-icon:hover {
-  transform: scale(1.1);
-}
-
-.btn-edit-icon {
-  background-color: #ffc107;
-  color: #212529;
-}
-
-.btn-edit-icon:hover {
-  background-color: #e0a800;
-}
-
-/* Section Styles */
-.add-card-section,
-.edit-card-section,
-.add-deck-section,
-.edit-deck-section {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.edit-deck-section {
-  border-left: 3px solid #ffc107;
-}
-
-.child-decks-section {
-  margin: 2rem 0;
-  padding-top: 1rem;
-  border-top: 1px solid #dee2e6;
-}
-
-/* Flashcards Grid */
-.flashcards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-/* Typography */
-h2 {
-  margin: 1.5rem 0 1rem;
-  color: #343a40;
-  font-weight: 600;
-}
-
-/* Deck page specific responsive adjustments */
-@media (max-width: 576px) {
-  .deck-stats {
-    flex-direction: column;
+/* ===================
+   LAYOUT & STRUCTURE 
+   =================== */
+   .deck-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  /* ===================
+     TYPOGRAPHY
+     =================== */
+  h2 {
+    margin: 1.5rem 0 1rem;
+    color: #343a40;
+    font-weight: 600;
+  }
+  
+  .deck-description {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: #6c757d;
+    line-height: 1.5;
+  }
+  
+  /* ===================
+     DECK HEADER & INFO
+     =================== */
+  .deck-header {
+    display: flex;
+    align-items: center;
     gap: 0.75rem;
+    margin-bottom: 0.5rem;
   }
   
-  .flashcards-grid {
-    grid-template-columns: 1fr;
+  .deck-header h1 {
+    display: flex;
+    align-items: center;
   }
   
+  .deck-info {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Stats styling */
+  .deck-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  
+  .stat-icon {
+    font-size: 1.3rem;
+  }
+  
+  /* ===================
+     BUTTON STYLES
+     =================== */
+  /* Standard buttons */
+  .btn:not(:disabled):active {
+    transform: translateY(1px);
+  }
+  
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .btn-primary {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-primary:hover:not(:disabled) {
+    background-color: #27ae60;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .btn-secondary:hover:not(:disabled) {
+    background-color: #5a6268;
+  }
+  
+  .btn-delete {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .btn-delete:hover:not(:disabled) {
+    background-color: #c82333;
+  }
+  
+  /* Icon buttons */
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background-color 0.2s, transform 0.1s;
+  }
+  
+  .btn-icon:hover {
+    transform: scale(1.1);
+  }
+  
+  .btn-edit-icon {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .btn-edit-icon:hover {
+    background-color: #e0a800;
+  }
+  
+  /* Action container */
   .deck-actions {
-    flex-direction: column;
-    align-items: stretch;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
   }
-}
-
-/* --- Button Styles --- */
-
-.btn:not(:disabled):active {
-  transform: translateY(1px);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  background-color: #28a745;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background-color: #27ae60;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: #5a6268;
-}
-
-.btn-delete {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-delete:hover:not(:disabled) {
-  background-color: #c82333;
-}
+  
+  /* ===================
+     SECTION CONTAINERS
+     =================== */
+  .add-card-section,
+  .edit-card-section,
+  .add-deck-section,
+  .edit-deck-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .edit-deck-section {
+    border-left: 3px solid #ffc107;
+  }
+  
+  .child-decks-section {
+    margin: 2rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+    margin-top: 30px;
+    position: relative;
+  }
+  
+  /* ===================
+     FLASHCARDS DISPLAY
+     =================== */
+  .flashcards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  /* ===================
+     FOLDER STYLING
+     =================== */
+  .folder-style {
+    background-color: #ffd868;
+    padding: 15px;
+    border-radius: 5px;
+    position: relative;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .folder-style:before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    width: 120px;
+    height: 10px;
+    border-radius: 5px 5px 0 0;
+    background-color: #ffd868;
+    box-shadow: 0 -2px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .folder-icon {
+    margin-right: 10px;
+  }
+  
+  /* Folder group styling */
+  .child-decks-section h2 {
+    margin-bottom: 20px;
+    padding-left: 30px;
+    position: relative;
+  }
+  
+  .child-decks-section h2:before {
+    content: '📂';
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.4rem;
+  }
+  
+  /* ===================
+     RESPONSIVE DESIGN
+     =================== */
+  @media (max-width: 576px) {
+    .deck-stats {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .flashcards-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .deck-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }

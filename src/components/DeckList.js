@@ -148,7 +148,7 @@ function DeckList({ decks, onDelete, onUpdate }) {
               </form>
             </div>
           ) : (
-            <>
+            <div className="deck-content">
               <h3>{deck.title}</h3>
               <p>{deck.description}</p>
               <div className="deck-stats">
@@ -160,7 +160,6 @@ function DeckList({ decks, onDelete, onUpdate }) {
                 </span>
               </div>
               <div className="deck-actions">
-              <Link to={`/study/${deck.id}`} className="btn btn-study">Study</Link>
                 <Link to={`/deck/${deck.id}`} className="btn btn-view">View</Link>
                 <button 
                   className="btn btn-edit"
@@ -175,8 +174,9 @@ function DeckList({ decks, onDelete, onUpdate }) {
                 >
                   Delete
                 </button>
+                <Link to={`/study/${deck.id}`} className="btn btn-study">Study</Link>
               </div>
-            </>
+            </div>
           )}
         </div>
       ))}
