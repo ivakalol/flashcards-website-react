@@ -181,7 +181,7 @@ const DeckList = ({ decks, isLoading = false, onDelete, onUpdate }) => {
               <div className="deck-actions">
                 <Link 
                   to={`/deck/${deck.id}`} 
-                  className="btn btn-primary"
+                  className="btn btn-view"
                 >
                   View
                 </Link>
@@ -197,6 +197,7 @@ const DeckList = ({ decks, isLoading = false, onDelete, onUpdate }) => {
                 >
                   Delete
                 </button>
+                <Link to={`/study/${deck.id}`} className="btn btn-study">Study Deck</Link>
               </div>
             </div>
           )}
