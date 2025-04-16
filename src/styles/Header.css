@@ -1,11 +1,11 @@
 /* Header Component */
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
   background-color: var(--color-accent);
   color: var(--color-accent-text);
   padding: var(--spacing-md) var(--spacing-md);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -65,23 +65,30 @@
   border-radius: 1px;
 }
 
+.auth-container {
+  margin-left: 21px;
+  display: flex;
+  align-items: center;
+}
+
 /* Responsive header */
 @media (max-width: 768px) {
   .header {
-    flex-direction: column;
-    padding: var(--spacing-sm);
+    flex-wrap: wrap;
   }
   
   .logo {
-    margin-bottom: var(--spacing-sm);
+    order: 1;
   }
   
-  .nav ul {
-    flex-wrap: wrap;
-    justify-content: center;
+  .nav {
+    order: 3;
+    width: 100%;
+    margin-top: 10px;
   }
   
-  .nav li {
-    margin: var(--spacing-xs);
+  .auth-container {
+    order: 2;
+    margin-left: auto;
   }
 }

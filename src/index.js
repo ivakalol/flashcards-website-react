@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './styles/index.css';
+import './firebase/config'; // Import Firebase config first to ensure it's initialized before anything else
+import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 

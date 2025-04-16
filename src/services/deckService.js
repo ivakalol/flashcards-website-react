@@ -1,48 +1,10 @@
+import { firebaseStorage } from './firebaseService.js';
+import { getCurrentUser } from './authService.js';
+
 // Constants
-const STORAGE_KEY = 'flashcards_decks';
-
-// Sample initial data with nested deck structure
-const initialDecks = [
-  {
-    id: '1',
-    title: 'JavaScript Basics',
-    description: 'Fundamental concepts of JavaScript programming',
-    parentId: null, // Top-level deck
-    color: '#ffcb91', // Default color (light orange)
-    cards: [
-      { id: '101', question: 'What is JavaScript?', answer: 'A programming language that enables interactive web pages' },
-      { id: '102', question: 'What is a variable?', answer: 'A container that stores a value' }
-    ]
-  },
-  {
-    id: '2',
-    title: 'React Fundamentals',
-    description: 'Core concepts of the React library',
-    parentId: null, // Top-level deck
-    color: '#a8dadc', // Default color (light blue)
-    cards: [
-      { id: '201', question: 'What is JSX?', answer: 'A syntax extension for JavaScript that looks similar to HTML' },
-      { id: '202', question: 'What is a React component?', answer: 'A reusable piece of code that returns React elements describing what should appear on the screen' }
-    ]
-  }
-];
-
-// Utility functions for storage operations
-const storage = {
-  initialize: () => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialDecks));
-    }
-  },
-  
-  getAll: () => {
-    storage.initialize();
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  },
-  
-  save: (decks) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(decks));
-  }
+const DEFAULT_COLORS = {
+  DEFAULT: '#ffcb91', // Default folder color
+  SECONDARY: '#a8dadc' // Secondary default color
 };
 
 // Utility functions for deck operations
@@ -66,7 +28,7 @@ const deckUtils = {
 
 // Get all decks
 export const getDecks = async () => {
-  return storage.getAll();
+  return firebaseStorage.getAll();
 };
 
 // Get decks by parent ID (null for top-level decks)
@@ -98,70 +60,107 @@ export const getDeckPath = async (deckId) => {
 
 // Get a specific deck by ID
 export const getDeck = async (deckId) => {
-  const decks = await getDecks();
-  return decks.find(deck => deck.id === deckId) || null;
+  try {
+    // First try to get a specific deck directly from Firestore
+    const deck = await firebaseStorage.getById(deckId);
+    return deck;
+  } catch (error) {
+    console.error("Error getting deck directly:", error);
+    
+    // Fall back to getting all decks and filtering
+    const decks = await getDecks();
+    return decks.find(deck => deck.id === deckId) || null;
+  }
 };
 
 // Create a new deck
 export const createDeck = async (deckData, parentId = null) => {
-  const decks = await getDecks();
+  const currentUser = getCurrentUser();
+  if (!currentUser) throw new Error('User must be logged in to create a deck');
+  
   const newDeck = {
     ...deckData,
     id: deckUtils.generateId(),
     parentId: parentId,
-    color: deckData.color || '#ffcb91', // Default color if not provided
+    color: deckData.color || DEFAULT_COLORS.DEFAULT,
+    userId: currentUser.uid,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     cards: []
   };
   
-  storage.save([...decks, newDeck]);
+  await firebaseStorage.save(newDeck);
   return newDeck;
 };
 
 // Add a card to a deck
 export const addCardToDeck = async (deckId, cardData) => {
-  const decks = await getDecks();
-  const deckIndex = deckUtils.findDeckIndex(decks, deckId);
+  const deck = await getDeck(deckId);
+  if (!deck) throw new Error(`Deck with ID ${deckId} not found`);
+  
+  // Verify ownership
+  const currentUser = getCurrentUser();
+  if (!currentUser || deck.userId !== currentUser.uid) {
+    throw new Error('You do not have permission to modify this deck');
+  }
   
   const newCard = {
     ...cardData,
-    id: deckUtils.generateId()
+    id: deckUtils.generateId(),
+    createdAt: new Date().toISOString()
   };
   
   const updatedDeck = {
-    ...decks[deckIndex],
-    cards: [...decks[deckIndex].cards, newCard]
+    ...deck,
+    cards: [...deck.cards, newCard],
+    updatedAt: new Date().toISOString()
   };
   
-  const updatedDecks = deckUtils.updateDeckInList(decks, deckIndex, updatedDeck);
-  storage.save(updatedDecks);
-  
+  await firebaseStorage.save(updatedDeck);
   return updatedDeck;
 };
 
 // Update a deck
 export const updateDeck = async (deckId, deckData) => {
-  const decks = await getDecks();
-  const deckIndex = deckUtils.findDeckIndex(decks, deckId);
+  const deck = await getDeck(deckId);
+  if (!deck) throw new Error(`Deck with ID ${deckId} not found`);
+  
+  // Verify ownership
+  const currentUser = getCurrentUser();
+  if (!currentUser || deck.userId !== currentUser.uid) {
+    throw new Error('You do not have permission to modify this deck');
+  }
   
   const updatedDeck = {
-    ...decks[deckIndex],
+    ...deck,
     ...deckData,
     // Preserve these properties unless explicitly provided
-    parentId: deckData.parentId !== undefined ? deckData.parentId : decks[deckIndex].parentId,
-    cards: deckData.cards || decks[deckIndex].cards,
-    color: deckData.color || decks[deckIndex].color, // Preserve color if not provided
-    id: deckId // Ensure ID doesn't change
+    parentId: deckData.parentId !== undefined ? deckData.parentId : deck.parentId,
+    cards: deckData.cards || deck.cards,
+    color: deckData.color || deck.color,
+    userId: deck.userId, // Never change the owner
+    id: deckId, // Ensure ID doesn't change
+    updatedAt: new Date().toISOString()
   };
   
-  const updatedDecks = deckUtils.updateDeckInList(decks, deckIndex, updatedDeck);
-  storage.save(updatedDecks);
-  
+  await firebaseStorage.save(updatedDeck);
   return updatedDeck;
 };
 
 // Delete a deck (and all child decks)
 export const deleteDeck = async (deckId) => {
   const decks = await getDecks();
+  const deckToDelete = decks.find(d => d.id === deckId);
+  
+  if (!deckToDelete) {
+    throw new Error(`Deck with ID ${deckId} not found`);
+  }
+  
+  // Verify ownership
+  const currentUser = getCurrentUser();
+  if (!currentUser || deckToDelete.userId !== currentUser.uid) {
+    throw new Error('You do not have permission to delete this deck');
+  }
   
   // Find all child deck IDs (recursive)
   const findChildDeckIds = (parentId) => {
@@ -181,32 +180,46 @@ export const deleteDeck = async (deckId) => {
   const childDeckIds = findChildDeckIds(deckId);
   const allDeckIdsToDelete = [deckId, ...childDeckIds];
   
-  // Filter out the decks to delete
-  const updatedDecks = decks.filter(deck => !allDeckIdsToDelete.includes(deck.id));
-  storage.save(updatedDecks);
+  // Delete all decks at once using a batch operation
+  try {
+    await firebaseStorage.deleteBatch(allDeckIdsToDelete);
+  } catch (error) {
+    console.error('Error deleting decks:', error);
+    throw new Error('Failed to delete deck and its children. Please try again.');
+  }
 };
 
 // Delete a card from a deck
 export const deleteCardFromDeck = async (deckId, cardId) => {
-  const decks = await getDecks();
-  const deckIndex = deckUtils.findDeckIndex(decks, deckId);
+  const deck = await getDeck(deckId);
+  if (!deck) throw new Error(`Deck with ID ${deckId} not found`);
+  
+  // Verify ownership
+  const currentUser = getCurrentUser();
+  if (!currentUser || deck.userId !== currentUser.uid) {
+    throw new Error('You do not have permission to modify this deck');
+  }
   
   const updatedDeck = {
-    ...decks[deckIndex],
-    cards: decks[deckIndex].cards.filter(card => card.id !== cardId)
+    ...deck,
+    cards: deck.cards.filter(card => card.id !== cardId),
+    updatedAt: new Date().toISOString()
   };
   
-  const updatedDecks = deckUtils.updateDeckInList(decks, deckIndex, updatedDeck);
-  storage.save(updatedDecks);
-  
+  await firebaseStorage.save(updatedDeck);
   return updatedDeck;
 };
 
 // Update a card in a deck
 export const updateCardInDeck = async (deckId, cardId, cardData) => {
-  const decks = await getDecks();
-  const deckIndex = deckUtils.findDeckIndex(decks, deckId);
-  const deck = decks[deckIndex];
+  const deck = await getDeck(deckId);
+  if (!deck) throw new Error(`Deck with ID ${deckId} not found`);
+  
+  // Verify ownership
+  const currentUser = getCurrentUser();
+  if (!currentUser || deck.userId !== currentUser.uid) {
+    throw new Error('You do not have permission to modify this deck');
+  }
   
   const cardIndex = deck.cards.findIndex(card => card.id === cardId);
   if (cardIndex === -1) {
@@ -217,22 +230,133 @@ export const updateCardInDeck = async (deckId, cardId, cardData) => {
   updatedCards[cardIndex] = {
     ...updatedCards[cardIndex],
     question: cardData.question,
-    answer: cardData.answer
+    answer: cardData.answer,
+    updatedAt: new Date().toISOString()
   };
   
   const updatedDeck = {
     ...deck,
-    cards: updatedCards
+    cards: updatedCards,
+    updatedAt: new Date().toISOString()
   };
   
-  const updatedDecks = deckUtils.updateDeckInList(decks, deckIndex, updatedDeck);
-  storage.save(updatedDecks);
-  
+  await firebaseStorage.save(updatedDeck);
   return updatedDeck;
 };
 
 // Get count of child decks for a parent deck
 export const getChildDecksCount = async (parentId) => {
+  try {
+    // Try to get count directly from Firestore (more efficient)
+    const count = await firebaseStorage.getChildCount(parentId);
+    return count;
+  } catch (error) {
+    console.error("Error getting child count directly:", error);
+    
+    // Fall back to getting all decks and counting
+    const decks = await getDecks();
+    return decks.filter(deck => deck.parentId === parentId).length;
+  }
+};
+
+// Data migration - one-time function to migrate data from localStorage to Firestore
+export const migrateFromLocalStorage = async () => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) throw new Error('User must be logged in to migrate data');
+  
+  // Get decks from localStorage
+  const STORAGE_KEY = 'flashcards_decks';
+  let localDecks = [];
+  
+  try {
+    const localData = localStorage.getItem(STORAGE_KEY);
+    if (localData) {
+      localDecks = JSON.parse(localData);
+    }
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    throw new Error('Failed to read local data');
+  }
+  
+  if (localDecks.length === 0) {
+    console.log('No local data to migrate');
+    return { migrated: 0 };
+  }
+  
+  // Add user ID and timestamps to all decks
+  const timestamp = new Date().toISOString();
+  const preparedDecks = localDecks.map(deck => ({
+    ...deck,
+    userId: currentUser.uid,
+    createdAt: timestamp,
+    updatedAt: timestamp
+  }));
+  
+  // Save all decks to Firestore
+  try {
+    await firebaseStorage.saveBatch(preparedDecks);
+    
+    // Clear localStorage after successful migration
+    localStorage.removeItem(STORAGE_KEY);
+    
+    return { 
+      migrated: preparedDecks.length,
+      success: true
+    };
+  } catch (error) {
+    console.error('Error migrating to Firestore:', error);
+    throw new Error('Failed to migrate data to cloud storage');
+  }
+};
+
+// Backup all user decks to a downloadable JSON file
+export const backupDecks = async () => {
   const decks = await getDecks();
-  return decks.filter(deck => deck.parentId === parentId).length;
+  
+  const dataStr = JSON.stringify(decks, null, 2);
+  const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+  
+  const exportFileName = `flashcards_backup_${new Date().toISOString().slice(0, 10)}.json`;
+  
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileName);
+  linkElement.click();
+  
+  return { success: true, count: decks.length };
+};
+
+// Restore decks from a backup file
+export const restoreDecks = async (backupData) => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) throw new Error('User must be logged in to restore data');
+  
+  try {
+    let decksToRestore = [];
+    
+    if (typeof backupData === 'string') {
+      decksToRestore = JSON.parse(backupData);
+    } else {
+      decksToRestore = backupData;
+    }
+    
+    // Ensure all decks have user ID and timestamps
+    const timestamp = new Date().toISOString();
+    const preparedDecks = decksToRestore.map(deck => ({
+      ...deck,
+      userId: currentUser.uid, // Assign to current user
+      updatedAt: timestamp
+    }));
+    
+    // Save all decks to Firestore
+    await firebaseStorage.saveBatch(preparedDecks);
+    
+    return { 
+      restored: preparedDecks.length,
+      success: true
+    };
+  } catch (error) {
+    console.error('Error restoring data:', error);
+    throw new Error('Failed to restore backup data');
+  }
 };
